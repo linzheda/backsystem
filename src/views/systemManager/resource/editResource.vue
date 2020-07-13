@@ -1,19 +1,41 @@
 <template>
     <div class="editResource">
-        <el-form ref="form" label-width="90px">
+        <el-dialog v-el-drag-dialog
+                   v-if="showPidDialog"
+                   :append-to-body="true"
+                   title="选择上级菜单"
+                   :visible.sync="showPidDialog"
+                   width="20%">
+            <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
+                     check-strictly
+                     ref="tree"
+                     show-checkbox
+                     default-expand-all
+                     :default-checked-keys="[form['pid']]"
+                     node-key="id"
+                     @check-change="treeRadio"
+                     :load="loadNode"
+                     lazy></el-tree>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showPidDialog = false">取 消</el-button>
+                <el-button type="primary" @click="changePid">确 定</el-button>
+        </span>
+        </el-dialog>
+        <el-form ref="form" label-width="6em">
             <el-form-item label="上级菜单">
-                <el-input :disabled="true" @click="showPidDialog=true" v-model="form.pid_text"></el-input>
+                <el-input :disabled="true" @click.native="showPidDialog=true" v-model="form.pid_text"
+                          suffix-icon="el-icon-search"></el-input>
             </el-form-item>
             <el-form-item label="菜单类型">
                 <el-radio-group v-model="form.type">
                     <el-radio v-for="item of type_list" :key="item.value" :label="item.value">{{item.name}}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="菜单名称">
+            <el-form-item label="菜单名称" class="wid50">
                 <el-input v-model="form.name"></el-input>
             </el-form-item>
-            <el-form-item label="显示排序">
-                <el-input v-model="form.seq"></el-input>
+            <el-form-item label="显示排序" class="wid50">
+                <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="描述">
                 <el-input type="textarea" v-model="form.description"></el-input>
@@ -36,42 +58,44 @@
                         inactive-color="#ff4949">
                 </el-switch>
             </el-form-item>
-
             <div v-if="routeSwitch">
-                <el-form-item label="路由路径">
+                <el-form-item label="路径" class="wid50">
                     <el-input v-model="form.route.path"></el-input>
                 </el-form-item>
-                <el-form-item label="路由组件">
-                    <el-input v-model="form.route.component"></el-input>
-                </el-form-item>
-                <el-form-item label="路由名称">
+                <el-form-item label="名称" class="wid50">
                     <el-input v-model="form.route.name"></el-input>
                 </el-form-item>
-                <el-form-item label="路由重定位">
+                <el-form-item label="组件">
+                    <el-input v-model="form.route.component"></el-input>
+                </el-form-item>
+                <el-form-item label="重定位" class="wid50">
                     <el-input v-model="form.route.redirect"></el-input>
                 </el-form-item>
-                <el-form-item label="路由缓存">
+                <el-form-item label="是否缓存" class="wid50">
                     <el-radio-group v-model="form.route.meta.keepAlive">
-                        <el-radio :label="true" >缓存</el-radio>
-                        <el-radio :label="false" >不缓存</el-radio>
+                        <el-radio :label="true">缓存</el-radio>
+                        <el-radio :label="false">不缓存</el-radio>
                     </el-radio-group>
                 </el-form-item>
 
             </div>
         </el-form>
         <span slot="footer" class="dialog-footer">
-                <el-button @click="isVisible = false">取 消</el-button>
+                <el-button @click="showCurrentDialog = false">取 消</el-button>
                 <el-button type="primary" @click="onSubmit">确 定</el-button>
         </span>
     </div>
 </template>
 
 <script>
-    import svgIcons from '@/icons/svg-icons'
+    import svgIcons from '@/icons/svg-icons';
+    import elDragDialog from '@/directives/el-drag-dialog';
 
     export default {
         name: "editResource",
+        directives: {elDragDialog},
         props: {
+            showDialog: Boolean,//是否显示dialog
             editData: {
                 type: Object,
                 default: null
@@ -80,10 +104,20 @@
         data() {
             return {
                 form: {
-                    type: 0
+                    id:'',
+                    icon:'',
+                    name:'',
+                    pid:'',
+                    pid_text:'',
+                    rank:null,
+                    seq:null,
+                    attr:null,
+                    description:'',
+                    type: 0,
+                    route:{}
                 },//表单数据
                 type_list: [],//类型列表,
-                showDialog: true,//是否显示dialog
+                showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
                 showPidDialog: false,//是否显示选择piddialog
                 svgIcons: svgIcons,//图标集合
                 showIcons: false,//是否显示图表
@@ -91,9 +125,9 @@
             }
         },
         watch: {
-            showDialog(value) {
+            showCurrentDialog(value) {
                 if (value === false) {
-                    this.$emit("showDialog", false);
+                    this.$emit("update:showDialog", false);
                 }
             }
         },
@@ -101,8 +135,8 @@
             this.getDict('resources_type').then(data => {
                 this.type_list = data;
             });
-            this.form = Object.assign({}, this.editData);
-            let route = {
+            this.form = Object.assign( this.form, this.editData);
+            let route  = {
                 name: '',
                 path: '',
                 component: '',
@@ -115,10 +149,10 @@
                 this.routeSwitch = false;
             } else {
                 this.routeSwitch = true;
-                let temp =eval('(' +this.editData['route'] + ')');
-                route = Object.assign( route, temp);
+                let temp = eval('(' + this.editData['route'] + ')');
+                route = Object.assign(route, temp);
             }
-            this.form['route'] = route;
+            this.form['route'] = Object.assign({},route);
         },
         methods: {
             //获取数据字典
@@ -134,6 +168,7 @@
                     });
                 });
             },
+            //失去焦点的不显示图表
             iconBlur() {
                 setTimeout(() => {
                     this.showIcons = false
@@ -143,25 +178,70 @@
             clickIcon(item) {
                 this.form.icon = item;
             },
+            //菜单树加载
+            loadNode(node, resolve) {
+                let pid = this.$utils.isNotEmpty(node['data']) ? node['data']['id'] : 0;
+                this.getPTreeByPid(pid).then(res => {
+                    resolve(res);
+                });
+            },
+            //菜单树单选控制
+            treeRadio(data, checked) {
+                if (checked) {
+                    this.$refs.tree.setCheckedNodes([data]);
+                }
+            },
+            //获取菜单
+            getPTreeByPid(pid) {
+                let param = {
+                    pid: pid,
+                    filter_id: this.form['id']
+                };
+                return new Promise(resolve => {
+                    this.$http.post('/user/resources/getResourcesByPid', param).then(res => {
+                        let data = res['data'];
+                        data.forEach(item => {
+                            item['leaf'] = item['children_cnt'] > 0 ? false : true;
+                            item['label'] = item['name'];
+                        });
+                        resolve(data);
+                    });
+                });
+            },
+            //确定改变父级菜单的id
+            changePid() {
+                let node = this.$refs.tree.getCheckedNodes();
+                if(node!=null){//说明有选择
+                    this.form['pid_text'] = node[0]['name'];
+                    this.form['pid'] = node[0]['id'];
+                    this.form['rank'] = node[0]['rank']+1;
+                    this.form['isn'] = node[0]['isn'];
+                }else{
+                    this.form['pid_text'] = '';
+                    this.form['pid'] =0;
+                }
+                this.showPidDialog=false;
+            },
             //提交
             onSubmit() {
-                this.form['route']['meta']['title'] = this.form['name'];
-                this.form['route']['meta']['icon'] = this.form['icon'];
-                this.form['route']['meta']['attr'] = this.form['attr'];
-                let editData=Object.assign({},this.form);
-                editData['route'] = JSON.stringify(editData['route']);
-                console.log(editData);
+                if( this.routeSwitch ){
+                    this.form['route']['meta']['title'] = this.form['name'];
+                    this.form['route']['meta']['icon'] = this.form['icon'];
+                    this.form['route']['meta']['attr'] = this.form['attr'];
+                }
+                let editData = Object.assign({}, this.form);
+                editData['route'] = this.routeSwitch?JSON.stringify(editData['route']):'';
                 editData['type'] = Number(editData['type']);
-                debugger
                 this.$http.post("/user/resources/editResources", editData).then(res => {
-                    if(res['data']){
-                        this.showDialog=false;
+                    if (res['data']['isSuccess']) {
+                        this.showCurrentDialog = false;
                         this.$message({
-                            message: '恭喜你，编辑成功',
+                            message: res['msg'],
                             type: 'success'
                         });
-                    }else{
-                        this.$message.error('编辑失败');
+                        this.$emit("reloadData", this.form['pid']);
+                    } else {
+                        this.$message.error(res['msg']);
                     }
                 });
             }
@@ -185,5 +265,10 @@
     .dialog-footer {
         text-align: right;
         display: block;
+    }
+
+    .wid50 {
+        width: 50%;
+        display: inline-block;
     }
 </style>

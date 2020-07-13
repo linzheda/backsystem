@@ -1,20 +1,19 @@
 import axios from 'axios'
-import { Message, MessageBox } from 'element-ui'
+import {Message, MessageBox} from 'element-ui'
 import store from '../store'
 import utils from '../utils/utils'
 
+
 // 创建axios实例
 const instance = axios.create({
-    baseURL: '/api/', // api的base_url
     headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},//设置以表单的形式提交  避免发两次请求
-    timeout: 15000 // 请求超时时间
+    timeout: 50000 // 请求超时时间
 });
 // request拦截器
 instance.interceptors.request.use(config => {
-    //处理数据将转换  必须要键值对的形式
-    config.data = transformRequest(config.data);
+    // 让每个请求携带自定义token 请根据实际情况自行修改
     const token = store.getters.token;
-    config.headers.common['Authorization'] = token;// 让每个请求携带自定义token 请根据实际情况自行修改
+    config.headers.common['Authorization'] = token;
     return config;
 }, error => {
     // eslint-disable-next-line no-console
@@ -30,12 +29,16 @@ instance.interceptors.response.use(
         if (res.status !== 200) {
             // 401:未登录;
             if (res.status === 401 || res.status === 403) {
-                alert( res.message);
+                Message({
+                    message: res.message,
+                    type: 'error',
+                    duration: 3 * 1000
+                });
             }
             return Promise.reject(response);
         } else {
-            if(utils.isNotEmpty(response.headers['authorization'])){
-                store.dispatch("updateToken",response.headers['authorization']);
+            if (utils.isNotEmpty(response.headers['authorization'])) {
+                store.dispatch("updateToken", response.headers['authorization']);
             }
             return response.data;
         }
@@ -51,7 +54,7 @@ instance.interceptors.response.use(
                     location.reload()// 为了重新实例化vue-router对象 避免bug
                 });
             });
-        }else{
+        } else {
             Message({
                 message: error.message,
                 type: 'error',
@@ -64,35 +67,69 @@ instance.interceptors.response.use(
     }
 );
 
+//转换为键值对的形式
 function transformRequest(data) {
     let str = [];
-    for (let key in  data) {
-        str.push(encodeURIComponent(key) + "=" + encodeURIComponent(data[key]));
+    for (let key in data) {
+        let value=utils.isEmpty(data[key])?'':data[key];
+        str.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
     }
     return str.join("&");
 }
 
 
-const get = (url, params = {},isCheck=true) => {
+//获取所有配置的url
+let result={};
+for(let key in process.env){
+    if(key.endsWith('_URL')){
+        let newkey = key.replace("VUE_APP_", '').replace("_URL", '');
+        newkey = newkey.toLocaleLowerCase();
+        result[newkey] = process.env[key];
+    }
+}
+const urlApi = result;
+
+
+const get = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransform=true) => {
+    url = baseUrl + url;
+    //转换为键值对的形式
+    if(isTransform){
+        params=transformRequest(params)
+    }
+    //检查约定的状态码
     if (isCheck) {
         return instance.get(url, params).then(res => {
             if (res.code != 200) {
-                alert( res.msg);
-            }else{
+                Message({
+                    message: res.msg,
+                    type: 'error',
+                    duration: 3 * 1000
+                });
+            } else {
                 return res;
             }
         });
-    }else{
+    } else {
         return instance.get(url, params);
     }
 };
 
-const post = (url, params = {}, isCheck = true) => {
+const post = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransform=true) => {
+    url = baseUrl + url;
+    //转换为键值对的形式
+    if(isTransform){
+        params=transformRequest(params)
+    }
+    //检查约定的状态码
     if (isCheck) {
         return instance.post(url, params).then(res => {
             if (res.code != 200) {
-                alert( res.msg);
-            }else{
+                Message({
+                    message: res.msg,
+                    type: 'error',
+                    duration: 3 * 1000
+                });
+            } else {
                 return res;
             }
         });
@@ -103,12 +140,13 @@ const post = (url, params = {}, isCheck = true) => {
 
 export {
     get,
-    post
+    post,
+    urlApi
 }
 
 export default {
     install(Vue) {
-        Vue.http = {get, post};
+        Vue.http = {get, post, urlApi};
         Vue.prototype.$http = Vue.http;
     }
 };

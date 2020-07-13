@@ -87,8 +87,8 @@ export class validateMsg {
         }
     }
 
-    checkAll(checklist,options){
-        return pluginInstance.checkAll(checklist,options,this);
+    checkAll(autoTip=true,checklist,options){
+        return pluginInstance.checkAll(checklist,options,this,autoTip);
     }
     clear(){
         this.errors.clear();

@@ -1,13 +1,9 @@
 const app = {
     state: {
-        imei: '1234567',//设备号
+        env:process.env.NODE_ENV,//环境 dev开发 prod生产
         tagsView: [],//tags数组集合
-        env:'dev',//环境 dev开发 production生产
     },
     mutations: {
-        SET_IMEI: (state, imei) => {//设置设备号
-            state.imei = imei
-        },
         SET_EVN:(state, env)=>{//设置环境
             state.env=env
         },
@@ -38,6 +34,9 @@ const app = {
 
     },
     actions: {
+        initEnv({commit}, env){//项目初始化是设置环境
+            commit('SET_EVN',env);
+        },
         addTagsView({commit}, view) {//新增
             commit('ADD_TAGSVIEW', view);
         },
@@ -59,9 +58,7 @@ const app = {
                 resolve([...state.tagsView]);
             });
         },
-        initEnv({commit}, env){//项目初始化是设置环境
-            commit('SET_EVN',env);
-        },
+
 
     }
 };

@@ -30,7 +30,7 @@
                     <a @click="login" class="eui-logBtn">登录</a>
                 </div>
             </div>
-            <div class="eui-canvas">
+            <div class="eui-canvas" >
                 <div class="eui-logo"><!--<img src="@/assets/logo.png"/>--></div>
                 <canvas id="canvas" width="100%" height="100%"/>
             </div>
@@ -56,7 +56,7 @@
             }
         },
         created() {
-            if (this.$store.getters.env!='production'){
+            if (this.$store.getters.env=='dev'){
                 this.username='admin';
                 this.password='admin';
             }
@@ -67,7 +67,7 @@
         methods: {
             login() {
                 let flag=false;
-                if (this.$store.getters.env!='production'){
+                if (this.$store.getters.env=='dev'){
                     flag=true;
                 }else{
                     flag=this.testTrueCode==this.testCode?true:false;
@@ -86,7 +86,11 @@
                     };
                     this.$store.dispatch('Login', jsonParam).then(res => {
                         if (res.code == 500) {
-                            alert(res.msg);
+                            this.$message({
+                                showClose: true,
+                                message: res.msg,
+                                type: 'error'
+                            });
                         }else{
                             this.$store.dispatch('getMenu').then((res)=>{
                                 this.$router.addRoutes(res);
@@ -96,7 +100,6 @@
                     });
                 }
             },
-
             // 绘制验证码
             drawCode (str='') {
                 let canvas = document.getElementById("verifyCanvas"); //获取HTML端画布

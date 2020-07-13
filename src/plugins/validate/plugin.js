@@ -2,7 +2,7 @@
  * 验证规则
  */
 import validator from './validator.js'
-
+import {Message} from 'element-ui'
 import mixin from './mixin.js'
 
 const isObject = (obj) => obj !== null && obj && typeof obj === 'object' && !Array.isArray(obj);
@@ -196,7 +196,7 @@ class validateUtil {
         return vm.$validator;
     }
 
-    checkAll(ckecklist,options,validate){
+    checkAll(ckecklist,options,validate,autoTip=true){
         let result=true;
         if(!ckecklist||!ckecklist.length){
             ckecklist=[];
@@ -221,6 +221,13 @@ class validateUtil {
                 let itemresult=this.checkItem(checkitem,validate);
                 result&&(result=itemresult);
             }
+        }
+        if(!result&&autoTip){
+            Message({
+                message: validate.errors.errors[0]['msg'],
+                type: 'error',
+                duration: 3 * 1000
+            });
         }
         return result;
     }
