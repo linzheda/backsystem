@@ -1,10 +1,10 @@
 <template>
     <div class="resource">
-        <div class="search">
+        <div class="search" v-if="showSearch">
             <el-form ref="form" label-width="80px">
                 <el-form-item label="菜单名称:">
                     <el-input
-                            placeholder="请输入内容"
+                            placeholder="请输入菜单名称"
                             prefix-icon="el-icon-search"
                             clearable
                             v-model="filter.name">
@@ -15,25 +15,44 @@
                 </el-form-item>
             </el-form>
         </div>
+        <!--表格-->
         <div class="content">
             <div class="do-box">
                 <div class="tui-left">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd()">新增</el-button>
-                    <el-button type="success" icon="el-icon-edit" @click="handleEdit()">修改</el-button>
-                    <el-button type="success" icon="el-icon-edit" @click="toggleRowExpansion()">展开/折叠</el-button>
+                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()">修改</el-button>
+                    <el-button type="primary" icon="el-icon-sort" @click="toggleRowExpansion()">展开/折叠</el-button>
                 </div>
-                <div class="right"></div>
+                <div class="tui-right">
+                    <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
+                    <el-button icon="el-icon-refresh" @click="loadData(0,true)"></el-button>
+                    <el-popover class="right-columns"
+                                placement="bottom"
+                                width="80"
+                                trigger="click">
+                        <div class="columns-checkbox">
+                            <el-checkbox v-for="item of showColumns" :key="item.prop" v-model="item.isShow">
+                                {{item.label}}
+                            </el-checkbox>
+                        </div>
+                        <el-button slot="reference" icon="el-icon-tickets"></el-button>
+                    </el-popover>
+                </div>
             </div>
             <div class="table" style="height: calc(100% - 50px)">
                 <el-table :data="data" row-key="id" lazy :load="load"
-                          highlight-current-row ref="resourceTable"
+                          highlight-current-row ref="treeTable"
                           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
                           style="width: 100%" border height="100%">
-                    <el-table-column prop="name" label="菜单名称" width="300"></el-table-column>
-                    <el-table-column prop="type_text" label="类型" width="80" align="center"></el-table-column>
-                    <el-table-column prop="route" label="路由"></el-table-column>
-                    <el-table-column prop="seq" sortable label="排序" width="80" align="center"></el-table-column>
-                    <el-table-column label="图标" width="80" align="center">
+                    <el-table-column prop="name" label="菜单名称" width="300" v-if="isShowColumn('name')"></el-table-column>
+                    <el-table-column prop="type_text" label="类型" width="80" align="center"
+                                     v-if="isShowColumn('type_text')"></el-table-column>
+                    <el-table-column prop="route" label="路由" v-if="isShowColumn('route')"></el-table-column>
+                    <el-table-column prop="rank" sortable label="等级" width="80" align="center"
+                                     v-if="isShowColumn('rank')"></el-table-column>
+                    <el-table-column prop="seq" sortable label="排序" width="80" align="center"
+                                     v-if="isShowColumn('seq')"></el-table-column>
+                    <el-table-column label="图标" width="80" align="center" v-if="isShowColumn('icon')">
                         <template slot-scope="scope">
                             <svg-icon v-if="scope.row.icon!=null" :icon-class="scope.row.icon"></svg-icon>
                         </template>
@@ -54,6 +73,7 @@
                 </el-table>
             </div>
         </div>
+        <!--弹窗-->
         <el-dialog v-el-drag-dialog
                    v-if="showEditDialog"
                    :append-to-body="true"
@@ -83,14 +103,32 @@
                 showEditDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
                 isOpen: false,//展开与折叠状态 默认折叠
+                showColumns: [
+                    {label: '菜单名称', prop: 'name', isShow: true},
+                    {label: '类型', prop: 'type_text', isShow: true},
+                    {label: '路由', prop: 'route', isShow: true},
+                    {label: '等级', prop: 'rank', isShow: true},
+                    {label: '排序', prop: 'seq', isShow: true},
+                    {label: '图标', prop: 'icon', isShow: true},
+                ],//显示的列
+                showSearch: true,//是否显示查询栏
             }
         },
         created() {
             this.getResourcesByPid(0).then(data => {
-                this.data = data;
+                this.$nextTick(() => {
+                    this.data = data;
+                });
             });
         },
         methods: {
+            //是否显示表格列
+            isShowColumn(prop) {
+                let temp = this.showColumns.find(item => {
+                    return item.prop == prop;
+                });
+                return temp['isShow'] || false;
+            },
             //获取菜单数据
             getResourcesByPid(pid) {
                 return new Promise(resolve => {
@@ -98,7 +136,7 @@
                         pid: pid
                     };
                     param = Object.assign(param, this.filter);
-                    this.$http.post('/user/resources/getResourcesByPid', param).then(res => {
+                    this.$http.post('user/resources/getResourcesByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             if (item['children_cnt'] > 0) {
@@ -134,7 +172,7 @@
             //点击编辑
             handleEdit(data) {
                 if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
-                    data = this.$refs.resourceTable.store.states.currentRow;
+                    data = this.$refs.treeTable.store.states.currentRow;
                     if (this.$utils.isEmpty(data)) {
                         this.$message.warning("请选择一行数据");
                     } else {
@@ -153,7 +191,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('/user/resources/delResources', {id: data['id']}).then(res => {
+                    this.$http.post('user/resources/delResources', {id: data['id']}).then(res => {
                         if (res['data']) {
                             this.$message({
                                 message: res['msg'] || '删除成功',
@@ -177,12 +215,12 @@
                 this.getResourcesByPid(pid).then(data => {
                     if (pid == 0 || pid == null || isReset) {
                         this.data.splice(0, this.data.length);
-                        for (let key in this.$refs.resourceTable.store.states.lazyTreeNodeMap) {
-                            this.$delete(this.$refs.resourceTable.store.states.lazyTreeNodeMap, key);
+                        for (let key in this.$refs.treeTable.store.states.lazyTreeNodeMap) {
+                            this.$delete(this.$refs.treeTable.store.states.lazyTreeNodeMap, key);
                         }
                         this.data = data;
                     }
-                    this.$set(this.$refs.resourceTable.store.states.lazyTreeNodeMap, pid, data);
+                    this.$set(this.$refs.treeTable.store.states.lazyTreeNodeMap, pid, data);
                 });
 
             },
@@ -193,13 +231,13 @@
             },
             toggleRowExpansionForAll(data, flag) {
                 data.forEach(item => {
-                    this.$refs.resourceTable.toggleRowExpansion(item, flag);
+                    this.$refs.treeTable.toggleRowExpansion(item, flag);
                     if (item['hasChildren']) {
                         if (item['children'] != null && item['children'].length > 0) {
                             this.toggleRowExpansionForAll(item.children, flag);
                         } else {
                             //todo:这里点击
-                            console.log(this.$refs.resourceTable)
+                            console.log(this.$refs.treeTable)
                         }
                     }
                 });
@@ -237,6 +275,11 @@
 
         .do-box {
             height: 50px;
+
+            .tui-right .el-button {
+                margin-left: 0;
+            }
+
         }
 
         .table {
@@ -246,4 +289,13 @@
         }
 
     }
+
+    .columns-checkbox {
+        .el-checkbox {
+            display: block;
+        }
+
+    }
+
+
 </style>

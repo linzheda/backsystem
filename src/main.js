@@ -15,14 +15,14 @@ import '@/styles/index.scss';
 import '@/styles/rem.js';
 import '@/icons'; // icon
 //findebug
-import * as fundebug from "fundebug-javascript";
+/*import * as fundebug from "fundebug-javascript";
 import fundebugVue from "fundebug-vue";
 require('fundebug-revideo');
 if (process.env.NODE_ENV != 'dev') {
     //findebug
     fundebug.apikey = "e20eeef4715ea880ce6db4653e6b846f7a43cc4453ba169ce166a90a599559af"
     fundebugVue(fundebug, Vue);
-}
+}*/
 
 let VueTouch = require('vue-touch');
 Vue.config.productionTip = process.env.NODE_ENV != 'dev' ? true : false;
