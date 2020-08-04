@@ -29,7 +29,7 @@ const user = {
     actions: {
         Login({commit}, userinfo) {//登陆
             return new Promise((resolve, reject) => {
-                post('user/userCtr/login', userinfo).then(data => {
+                post('user/user/login', userinfo).then(data => {
                     commit('SET_TOKEN', data.data.token);
                     commit('SET_ID', data.data.id);
                     commit('SET_NAME', data.data.name);

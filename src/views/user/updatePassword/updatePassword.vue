@@ -4,19 +4,19 @@
             <el-form-item label="用户名">
                 <el-input v-model="user.name" :disabled="true"/>
             </el-form-item>
-            <el-form-item label="旧密码">
+            <el-form-item label="旧密码" class="is-required">
                 <el-input v-model="user.oldPassword" show-password v-validate
                           data-rules="required" validate-name="pwd1" validate-type="keyup"
                           validate-tips-required="请输入旧密码"/>
                 <el-alert v-if="errors.get('pwd1')!=null" :title="errors.get('pwd1')" type="error"/>
             </el-form-item>
-            <el-form-item label="新密码">
+            <el-form-item label="新密码" class="is-required">
                 <el-input v-model="user.newPassword" show-password v-validate
                           data-rules="required" validate-name="pwd2" validate-type="keyup"
                           validate-tips-required="请输入新密码"/>
                 <el-alert v-if="errors.get('pwd2')!=null" :title="errors.get('pwd2')" type="error"/>
             </el-form-item>
-            <el-form-item label="再次确认">
+            <el-form-item label="再次确认" class="is-required">
                 <el-input v-model="user.newPasswordAgain" show-password v-validate
                           data-rules="required" validate-name="pwd3" validate-type="keyup"
                           validate-tips-required="请输入新密码"/>
@@ -60,7 +60,7 @@
             //修改密码
             onSubmit() {
                 if(this.$validator.checkAll()){
-                    this.$http.post('user/userCtr/updatePassword',this.user).then((res)=>{
+                    this.$http.post('user/user/updatePassword',this.user).then((res)=>{
                         if(res.data){
                             this.$message({
                                 message: res.msg,
@@ -71,8 +71,6 @@
                             this.$message.error(res['msg']);
                         }
                     });
-                }else{
-                    this.$message.error(this.errors['errors'][0]['msg']);
                 }
             }
         }

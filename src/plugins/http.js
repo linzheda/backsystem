@@ -90,7 +90,7 @@ for(let key in process.env){
 const urlApi = result;
 
 
-const get = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransform=true) => {
+const get = (url, params = {}, isCheck = true, baseUrl = '/api',isTransform=true) => {
     url = baseUrl + url;
     //转换为键值对的形式
     if(isTransform){
@@ -114,7 +114,7 @@ const get = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransf
     }
 };
 
-const post = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransform=true) => {
+const post = (url, params = {}, isCheck = true, baseUrl = '/api' ,isTransform=true) => {
     url = baseUrl + url;
     //转换为键值对的形式
     if(isTransform){

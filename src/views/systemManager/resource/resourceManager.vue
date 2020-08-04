@@ -16,7 +16,7 @@
             </el-form>
         </div>
         <!--表格-->
-        <div class="content">
+        <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd()">新增</el-button>
@@ -44,19 +44,19 @@
                           highlight-current-row ref="treeTable"
                           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
                           style="width: 100%" border height="100%">
-                    <el-table-column prop="name" label="菜单名称" width="300" v-if="isShowColumn('name')"></el-table-column>
-                    <el-table-column prop="type_text" label="类型" width="80" align="center"
-                                     v-if="isShowColumn('type_text')"></el-table-column>
-                    <el-table-column prop="route" label="路由" v-if="isShowColumn('route')"></el-table-column>
-                    <el-table-column prop="rank" sortable label="等级" width="80" align="center"
-                                     v-if="isShowColumn('rank')"></el-table-column>
-                    <el-table-column prop="seq" sortable label="排序" width="80" align="center"
-                                     v-if="isShowColumn('seq')"></el-table-column>
-                    <el-table-column label="图标" width="80" align="center" v-if="isShowColumn('icon')">
-                        <template slot-scope="scope">
-                            <svg-icon v-if="scope.row.icon!=null" :icon-class="scope.row.icon"></svg-icon>
-                        </template>
-                    </el-table-column>
+                    <template v-for="item of showColumns">
+                        <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
+                                         :prop="item.prop" :label="item.label"
+                                         :sortable="item.sortable" :fixed="item.fixed"
+                                         :width="item.width" :align="item.align"></el-table-column>
+                        <el-table-column v-else-if="item.isShow&&item.isScope"  :key="item.prop"
+                                         :label="item.label" :align="item.align" :width="item.width" >
+                            <template slot-scope="scope">
+                                <svg-icon v-if="scope.row.icon!=null" :icon-class="scope.row.icon"></svg-icon>
+                            </template>
+                        </el-table-column>
+                    </template>
+
                     <el-table-column label="操作" width="180" align="center">
                         <template slot-scope="scope">
                             <el-button
@@ -104,12 +104,12 @@
                 editData: {},//被选中编辑的数据
                 isOpen: false,//展开与折叠状态 默认折叠
                 showColumns: [
-                    {label: '菜单名称', prop: 'name', isShow: true},
-                    {label: '类型', prop: 'type_text', isShow: true},
+                    {label: '菜单名称', prop: 'name',width:300, isShow: true},
+                    {label: '类型', prop: 'type_text', align:'center',width:80, isShow: true},
                     {label: '路由', prop: 'route', isShow: true},
-                    {label: '等级', prop: 'rank', isShow: true},
-                    {label: '排序', prop: 'seq', isShow: true},
-                    {label: '图标', prop: 'icon', isShow: true},
+                    {label: '等级', prop: 'rank', align:'center',sortable:'sortable', width:80,isShow: true},
+                    {label: '排序', prop: 'seq', align:'center', sortable:'sortable',width:80,isShow: true},
+                    {label: '图标', prop: 'icon', align:'center',isScope:true,width:80, isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
             }
@@ -271,7 +271,7 @@
         background: white;
         border-radius: 10px;
         padding: 10px 20px;
-        height: calc(100% - 80px);
+        height: calc(100% - 90px);
 
         .do-box {
             height: 50px;

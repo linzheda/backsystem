@@ -3,10 +3,12 @@
         <div class="search" v-if="showSearch">
             <el-form ref="form" label-width="80px">
                 <el-form-item label="名称:">
-                    <el-input placeholder="请输入名称" prefix-icon="el-icon-search" clearable v-model="filter.name"></el-input>
+                    <el-input placeholder="请输入名称" prefix-icon="el-icon-search" clearable
+                              v-model="filter.name"></el-input>
                 </el-form-item>
                 <el-form-item label="key:">
-                    <el-input placeholder="请输入key" prefix-icon="el-icon-search" clearable v-model="filter.key"></el-input>
+                    <el-input placeholder="请输入key" prefix-icon="el-icon-search" clearable
+                              v-model="filter.key"></el-input>
                 </el-form-item>
                 <el-form-item label-width="10px">
                     <el-button type="primary" icon="el-icon-search" round @click="loadData(null)">搜索</el-button>
@@ -14,7 +16,7 @@
             </el-form>
         </div>
         <!--内容-->
-        <div class="content">
+        <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd()">新增</el-button>
@@ -42,12 +44,12 @@
                           highlight-current-row ref="treeTable"
                           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
                           style="width: 100%" border height="100%">
-                    <el-table-column prop="name" label="字典名称" width="300" v-if="isShowColumn('name')"></el-table-column>
-                    <el-table-column prop="dictkey" label="字典键" width="150" align="center" v-if="isShowColumn('dictkey')"></el-table-column>
-                    <el-table-column prop="value" label="字典值" width="80" align="center" v-if="isShowColumn('value')"></el-table-column>
-                    <el-table-column prop="description" label="描述" v-if="isShowColumn('description')"></el-table-column>
-                    <el-table-column prop="rank" sortable label="等级" width="80" align="center" v-if="isShowColumn('rank')"></el-table-column>
-                    <el-table-column prop="seq" sortable label="排序" width="80" align="center" v-if="isShowColumn('seq')"></el-table-column>
+                    <template v-for="item of showColumns">
+                        <el-table-column :key="item.prop" v-if="item.isShow"
+                                         :prop="item.prop" :label="item.label"
+                                         :sortable="item.sortable" :fixed="item.fixed"
+                                         :width="item.width" :align="item.align"></el-table-column>
+                    </template>
                     <el-table-column label="操作" width="180" align="center">
                         <template slot-scope="scope">
                             <el-button
@@ -95,14 +97,14 @@
                 editData: {},//被选中编辑的数据
                 isOpen: false,//展开与折叠状态 默认折叠
                 showColumns: [
-                    {label: '字典名称', prop: 'name', isShow: true},
-                    {label: '字典键', prop: 'dictkey', isShow: true},
-                    {label: '字典值', prop: 'value',  isShow: true},
+                    {label: '字典名称', prop: 'name', width: 300, isShow: true},
+                    {label: '字典键', prop: 'dictkey', align: 'center', width: 150, isShow: true},
+                    {label: '字典值', prop: 'value', align: 'center', width: 80, isShow: true},
                     {label: '描述', prop: 'description', isShow: true},
-                    {label: '等级', prop: 'rank', isShow: true},
-                    {label: '排序', prop: 'seq', isShow: true},
+                    {label: '等级', prop: 'rank', sortable: 'sortable', align: 'center', width: 80, isShow: true},
+                    {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: true},
                 ],//显示的列
-                showSearch:true,//是否显示查询栏
+                showSearch: true,//是否显示查询栏
             }
         },
         created() {
@@ -262,11 +264,12 @@
         background: white;
         border-radius: 10px;
         padding: 10px 20px;
-        height: calc(100% - 80px);
+        height: calc(100% - 90px);
 
         .do-box {
             height: 50px;
-            .tui-right .el-button{
+
+            .tui-right .el-button {
                 margin-left: 0;
             }
         }

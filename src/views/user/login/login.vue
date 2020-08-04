@@ -20,7 +20,7 @@
                         <span class="error">{{errors.get('login2')}}</span>
                     </p>
                     <p>
-                        <input type="text" class="eui-logIpt" style="width: 200px;" placeholder="请输入验证码"/>
+                        <input type="text" class="eui-logIpt" style="width: 180px;" placeholder="请输入验证码"/>
                         <span ref="verificationCode"   class="verificationCode" @click="resetCode()">
                             <canvas ref="verifyCanvas" width="100" height="40" id="verifyCanvas"></canvas>
                             <img ref="code_img" id="code_img" >

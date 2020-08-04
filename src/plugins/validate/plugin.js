@@ -196,6 +196,17 @@ class validateUtil {
         return vm.$validator;
     }
 
+    //移除校验规则
+    removeValidateRules(name,validate){
+        for(let key of Object.keys(validate._validateRules)){
+           if(key==name){
+               delete validate._validateRules[key];
+               delete validate._validateMsgs[key];
+               delete validate._validatePositions[key];
+           }
+        }
+    }
+
     checkAll(ckecklist,options,validate,autoTip=true){
         let result=true;
         if(!ckecklist||!ckecklist.length){

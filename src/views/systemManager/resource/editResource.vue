@@ -26,13 +26,16 @@
                 <el-input :disabled="true" @click.native="showPidDialog=true" v-model="form.pid_text"
                           suffix-icon="el-icon-search"></el-input>
             </el-form-item>
-            <el-form-item label="菜单类型">
+            <el-form-item label="菜单类型" class="is-required">
                 <el-radio-group v-model="form.type">
                     <el-radio v-for="item of type_list" :key="item.value" :label="item.value">{{item.name}}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="菜单名称" class="wid50">
-                <el-input v-model="form.name"></el-input>
+            <el-form-item label="菜单名称" class="wid50 is-required">
+                <el-input v-model="form.name" v-validate
+                          data-rules="required" validate-name="name" validate-type="keyup"
+                          validate-tips-required="请输入字典名称"></el-input>
+                <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
             </el-form-item>
             <el-form-item label="显示排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
@@ -59,14 +62,23 @@
                 </el-switch>
             </el-form-item>
             <div v-if="routeSwitch">
-                <el-form-item label="路径" class="wid50">
-                    <el-input v-model="form.route.path"></el-input>
+                <el-form-item label="路径" class="wid50 is-required">
+                    <el-input v-model="form.route.path" v-validate
+                              data-rules="required" validate-name="route.path" validate-type="keyup"
+                              validate-tips-required="请输入路径"></el-input>
+                    <el-alert v-if="errors.get('route.path')!=null" :title="errors.get('route.path')" type="error"/>
                 </el-form-item>
-                <el-form-item label="名称" class="wid50">
-                    <el-input v-model="form.route.name"></el-input>
+                <el-form-item label="名称" class="wid50 is-required">
+                    <el-input v-model="form.route.name" v-validate
+                              data-rules="required" validate-name="route.name" validate-type="keyup"
+                              validate-tips-required="请输入名称"></el-input>
+                    <el-alert v-if="errors.get('route.name')!=null" :title="errors.get('route.name')" type="error"/>
                 </el-form-item>
-                <el-form-item label="组件">
-                    <el-input v-model="form.route.component"></el-input>
+                <el-form-item label="组件" class="is-required">
+                    <el-input v-model="form.route.component" v-validate
+                              data-rules="required" validate-name="route.component" validate-type="keyup"
+                              validate-tips-required="请输入组件"></el-input>
+                    <el-alert v-if="errors.get('route.component')!=null" :title="errors.get('route.component')" type="error"/>
                 </el-form-item>
                 <el-form-item label="重定位" class="wid50">
                     <el-input v-model="form.route.redirect"></el-input>
@@ -128,6 +140,13 @@
             showCurrentDialog(value) {
                 if (value === false) {
                     this.$emit("update:showDialog", false);
+                }
+            },
+            routeSwitch(value){
+                if (value === false) {
+                    this.$validator.removeValidateRules('route.path');
+                    this.$validator.removeValidateRules('route.name');
+                    this.$validator.removeValidateRules('route.component');
                 }
             }
         },
@@ -224,26 +243,28 @@
             },
             //提交
             onSubmit() {
-                if( this.routeSwitch ){
-                    this.form['route']['meta']['title'] = this.form['name'];
-                    this.form['route']['meta']['icon'] = this.form['icon'];
-                    this.form['route']['meta']['attr'] = this.form['attr'];
-                }
-                let editData = Object.assign({}, this.form);
-                editData['route'] = this.routeSwitch?JSON.stringify(editData['route']):'';
-                editData['type'] = Number(editData['type']);
-                this.$http.post("/user/resources/editResources", editData).then(res => {
-                    if (res['data']['isSuccess']) {
-                        this.showCurrentDialog = false;
-                        this.$message({
-                            message: res['msg'],
-                            type: 'success'
-                        });
-                        this.$emit("reloadData", this.form['pid']);
-                    } else {
-                        this.$message.error(res['msg']);
+                if(this.$validator.checkAll()){
+                    if( this.routeSwitch ){
+                        this.form['route']['meta']['title'] = this.form['name'];
+                        this.form['route']['meta']['icon'] = this.form['icon'];
+                        this.form['route']['meta']['attr'] = this.form['attr'];
                     }
-                });
+                    let editData = Object.assign({}, this.form);
+                    editData['route'] = this.routeSwitch?JSON.stringify(editData['route']):'';
+                    editData['type'] = Number(editData['type']);
+                    this.$http.post("/user/resources/editResources", editData).then(res => {
+                        if (res['data']['isSuccess']) {
+                            this.showCurrentDialog = false;
+                            this.$message({
+                                message: res['msg'],
+                                type: 'success'
+                            });
+                            this.$emit("reloadData", this.form['pid']);
+                        } else {
+                            this.$message.error(res['msg']);
+                        }
+                    });
+                }
             }
         }
     }
@@ -265,6 +286,10 @@
     .dialog-footer {
         text-align: right;
         display: block;
+    }
+
+    .el-alert{
+        padding: 0 16px;
     }
 
     .wid50 {

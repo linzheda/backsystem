@@ -81,10 +81,16 @@ export class validateMsg {
     removeErrorMsg(name) {
         this.errors.deleteErrors(name);
     }
+
     clearMsg(id) {
         if(this.id===id){
             this.errors.clear();
         }
+    }
+
+    //移除校验规则
+    removeValidateRules(name){
+        return pluginInstance.removeValidateRules(name,this);
     }
 
     checkAll(autoTip=true,checklist,options){
