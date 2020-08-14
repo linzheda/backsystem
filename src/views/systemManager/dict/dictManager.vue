@@ -101,7 +101,7 @@
                     {label: '字典键', prop: 'dictkey', align: 'center', width: 150, isShow: true},
                     {label: '字典值', prop: 'value', align: 'center', width: 80, isShow: true},
                     {label: '描述', prop: 'description', isShow: true},
-                    {label: '等级', prop: 'rank', sortable: 'sortable', align: 'center', width: 80, isShow: true},
+                    {label: '等级', prop: 'level', sortable: 'sortable', align: 'center', width: 80, isShow: true},
                     {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
@@ -115,13 +115,6 @@
             });
         },
         methods: {
-            //是否显示表格列
-            isShowColumn(prop) {
-                let temp = this.showColumns.find(item => {
-                    return item.prop == prop;
-                });
-                return temp['isShow'] || false;
-            },
             //获取菜单数据
             getTreeByPid(pid) {
                 return new Promise(resolve => {

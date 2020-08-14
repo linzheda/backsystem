@@ -85,12 +85,15 @@ for(let key in process.env){
         let newkey = key.replace("VUE_APP_", '').replace("_URL", '');
         newkey = newkey.toLocaleLowerCase();
         result[newkey] = process.env[key];
+        if(newkey==='base'&&process.env.NODE_ENV==='dev'){
+            result[newkey] = '/api/';
+        }
     }
 }
 const urlApi = result;
 
 
-const get = (url, params = {}, isCheck = true, baseUrl = '/api',isTransform=true) => {
+const get = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransform=true) => {
     url = baseUrl + url;
     //转换为键值对的形式
     if(isTransform){
@@ -114,7 +117,7 @@ const get = (url, params = {}, isCheck = true, baseUrl = '/api',isTransform=true
     }
 };
 
-const post = (url, params = {}, isCheck = true, baseUrl = '/api' ,isTransform=true) => {
+const post = (url, params = {}, isCheck = true, baseUrl = urlApi['base'] ,isTransform=true) => {
     url = baseUrl + url;
     //转换为键值对的形式
     if(isTransform){

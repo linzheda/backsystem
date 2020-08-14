@@ -76,7 +76,7 @@
                     dictkey:'',
                     value:'',
                     pid_text:'',
-                    rank:null,
+                    level:null,
                     seq:null,
                     description:'',
                 },//表单数据
@@ -133,7 +133,7 @@
                 if(node!=null){//说明有选择
                     this.form['pid_text'] = node[0]['name'];
                     this.form['pid'] = node[0]['id'];
-                    this.form['rank'] = node[0]['rank']+1;
+                    this.form['level'] = node[0]['level']+1;
                 }else{
                     this.form['pid_text'] = '';
                     this.form['pid'] =0;

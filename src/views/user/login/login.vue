@@ -5,7 +5,6 @@
             <div class="eui-logMain">
                 <div class="eui-logR">
                     <h2>您好！</h2>
-
                     <h3>欢迎来到我们的管理系统！</h3>
                     <p>
                         <input type="text" class="eui-logIpt" placeholder="请输入账号" v-model="username"
@@ -39,7 +38,7 @@
 </template>
 
 <script>
-
+    import md5 from 'js-md5';
     export default {
         name: "login",
         data() {
@@ -78,11 +77,12 @@
                         message: '验证码错误',
                         type: 'error'
                     });
+                    return;
                 }
                 if (this.$validator.checkAll()) {
                     let jsonParam = {
                         name: this.username,
-                        password: this.password
+                        password: md5(this.password)
                     };
                     this.$store.dispatch('Login', jsonParam).then(res => {
                         if (res.code == 500) {
@@ -158,7 +158,6 @@
             },
             //绘制验证码
             resetCode () {
-
                 this.testTrueCode = this.drawCode();
             }
 
@@ -204,6 +203,8 @@
         font-weight: 400;
         line-height: 30px;
         margin: 0;
+
+
     }
 
     .eui-logR h3 {

@@ -54,7 +54,7 @@
                 </el-form>
             </div>
             <!--表格-->
-            <div class="content">
+            <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
                 <div class="do-box">
                     <div class="tui-left">
                         <el-button type="primary" icon="el-icon-plus" @click="handleAdd()">新增</el-button>
@@ -68,7 +68,7 @@
                                     width="80"
                                     trigger="click">
                             <div class="columns-checkbox">
-                                <el-checkbox v-for="item of showColumns" :key="item.prop" v-model="item.isShow">
+                                <el-checkbox v-for="item of showColumns" @change="changeColumns" :key="item.prop" v-model="item.isShow">
                                     {{item.label}}
                                 </el-checkbox>
                             </div>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="table" style="height: calc(100% - 50px)">
-                    <el-table :data="dataPage.records" row-key="id" highlight-current-row  ref="table">
+                    <el-table :data="dataPage.records" row-key="id" highlight-current-row  height=" calc(100% - 20px)" ref="table">
                         <template v-for="item of showColumns">
                             <el-table-column :key="item.prop" v-if="item.isShow"
                                              :prop="item.prop" :label="item.label"
@@ -90,7 +90,7 @@
                                         @click="handleEdit(scope.row)">编辑
                                 </el-button>
                                 <el-button size="mini"
-                                        @click="handleEdit(scope.row)">重置密码
+                                        @click="handleResetPwd(scope.row)">重置密码
                                 </el-button>
                                 <el-button size="mini" type="danger"
                                         @click="handleDelete(scope.row)">删除
@@ -110,14 +110,14 @@
                 </div>
             </div>
         </div>
-        <!---->
+        <!--弹窗-->
         <el-dialog v-el-drag-dialog
                    v-if="showEditDialog"
                    :append-to-body="true"
                    title="编辑用户"
                    :visible.sync="showEditDialog"
                    width="50%">
-            <edit-user :showDialog.sync=showEditDialog @reloadData="getData('current',1)"
+            <edit-user :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
                        :editData="editData"></edit-user>
         </el-dialog>
     </div>
@@ -145,17 +145,17 @@
                     records: []
                 },//表格分页数据
                 showColumns: [
-                    {label: '序号', prop: 'id', fixed: 'left', width: 80, isShow: true},
-                    {label: '用户名', prop: 'name', fixed: 'left', width: 150, isShow: true},
-                    {label: '登录名', prop: 'loginname', width: 150, isShow: true},
-                    {label: '电话', prop: 'tel', width: 150, isShow: true},
-                    {label: '状态', prop: 'status', width: 80, isShow: true},
-                    {label: '组织', prop: 'orgid_text', width: 180, isShow: true},
-                    {label: '岗位', prop: 'jobid_text', width: 100, isShow: false},
-                    {label: '身份证', prop: 'idcard', width: 300, isShow: false},
-                    {label: '性别', prop: 'sex', width: 80, isShow: true},
+                    {label: '序号', prop: 'id', fixed: 'left',align: 'center', width: 80, isShow: true},
+                    {label: '用户名', prop: 'name', fixed: 'left',align: 'center', width: 150, isShow: true},
+                    {label: '登录名', prop: 'loginname', width: 150,align: 'center', isShow: true},
+                    {label: '电话', prop: 'tel', width: 150,align: 'center', isShow: true},
+                    {label: '状态', prop: 'status', width: 80,align: 'center', isShow: true},
+                    {label: '组织', prop: 'orgid_text', width: 180,align: 'center', isShow: true},
+                    {label: '岗位', prop: 'jobid_text', width: 100,align: 'center', isShow: false},
+                    {label: '身份证', prop: 'idcard', width: 300,align: 'center', isShow: false},
+                    {label: '性别', prop: 'sex_text', width: 80,align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
-                    {label: '邮箱', prop: 'email', width: 300, isShow: false},
+                    {label: '邮箱', prop: 'email', width: 300,align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
@@ -211,23 +211,22 @@
                     this.$refs.tree.store.nodesMap[key].expanded = isExpand;
                 }
             },
-            //是否显示表格列
-            isShowColumn(prop) {
-                let temp = this.showColumns.find(item => {
-                    return item.prop == prop;
-                });
-                return temp['isShow'] || false;
-            },
             //获取用户列表数据 分页
             getData(type, val) {
                 this.dataPage[type] = val;
                 let param = {
-                    pageNo: this.dataPage.current,
-                    pageSize: this.dataPage.size,
+                    current: this.dataPage.current,
+                    size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
                 this.$http.post("/user/user/getUserList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
+                });
+            },
+            //表格重新布局
+            changeColumns(){
+                this.$nextTick(() => {
+                    this.$refs.table.doLayout();
                 });
             },
             //点击编辑
@@ -245,6 +244,26 @@
                     this.editData = data;
                 }
             },
+            //点击重置密码
+            handleResetPwd(data){
+                this.$confirm('您确定要重置'+data['name']+'的密码吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$http.post('user/user/resetPassword', {id: data['id']}).then(res => {
+                        if (res['data']) {
+                            this.$message({
+                                message: res['msg'] || '重置成功',
+                                type: 'success'
+                            });
+                            this.getData('current',this.dataPage.current);
+                        } else {
+                            this.$message.error(res['msg'] || '重置失败');
+                        }
+                    });
+                });
+            },
             //点击删除
             handleDelete(data) {
                 this.$confirm('您确定要删除这条记录吗?', '提示', {
@@ -258,7 +277,7 @@
                                 message: res['msg'] || '删除成功',
                                 type: 'success'
                             });
-                            this.getData('current',1);
+                            this.getData('current',this.dataPage.current);
                         } else {
                             this.$message.error(res['msg'] || '删除失败');
                         }

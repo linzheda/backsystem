@@ -122,13 +122,6 @@
             });
         },
         methods: {
-            //是否显示表格列
-            isShowColumn(prop) {
-                let temp = this.showColumns.find(item => {
-                    return item.prop == prop;
-                });
-                return temp['isShow'] || false;
-            },
             //获取菜单数据
             getResourcesByPid(pid) {
                 return new Promise(resolve => {
