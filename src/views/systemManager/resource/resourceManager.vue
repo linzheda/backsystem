@@ -132,11 +132,7 @@
                     this.$http.post('user/resources/getResourcesByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
-                            if (item['children_cnt'] > 0) {
-                                item['hasChildren'] = true;
-                            } else {
-                                item['hasChildren'] = false;
-                            }
+                            item['hasChildren']=item['children_cnt'] > 0?true:false;
                         })
                         resolve(data);
                     });

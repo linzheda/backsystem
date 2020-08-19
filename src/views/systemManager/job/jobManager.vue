@@ -1,14 +1,13 @@
 <template>
-    <div class="roleManager">
-        <!--查询块-->
+    <div class="jobManager">
         <div class="search" v-if="showSearch">
             <el-form ref="form" label-width="80px">
-                <el-form-item label="角色名称:">
-                    <el-input placeholder="请输入角色名称" prefix-icon="el-icon-search" clearable
+                <el-form-item label="岗位名称:">
+                    <el-input placeholder="请输入岗位名称" prefix-icon="el-icon-search" clearable
                               v-model="filter.name"></el-input>
                 </el-form-item>
-                <el-form-item label="角色编码:">
-                    <el-input placeholder="请输入角色编码" prefix-icon="el-icon-search" clearable
+                <el-form-item label="编码:">
+                    <el-input placeholder="请输入岗位编码" prefix-icon="el-icon-search" clearable
                               v-model="filter.code"></el-input>
                 </el-form-item>
                 <el-form-item label-width="10px">
@@ -31,8 +30,7 @@
                                 width="80"
                                 trigger="click">
                         <div class="columns-checkbox">
-                            <el-checkbox v-for="item of showColumns" :key="item.prop" @change="changeColumns"
-                                         v-model="item.isShow">
+                            <el-checkbox v-for="item of showColumns" @change="changeColumns" :key="item.prop" v-model="item.isShow">
                                 {{item.label}}
                             </el-checkbox>
                         </div>
@@ -41,27 +39,20 @@
                 </div>
             </div>
             <div class="table" style="height: calc(100% - 50px)">
-                <el-table :data="dataPage.records" row-key="id" highlight-current-row height="calc(100% - 20px)"
-                          ref="table">
+                <el-table :data="dataPage.records" row-key="id" highlight-current-row  height=" calc(100% - 20px)" ref="table">
                     <template v-for="item of showColumns">
                         <el-table-column :key="item.prop" v-if="item.isShow"
                                          :prop="item.prop" :label="item.label"
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
                     </template>
-                    <el-table-column label="操作" width="180" align="center" fixed="right">
+                    <el-table-column label="操作" width="240" align="center" fixed="right">
                         <template slot-scope="scope">
-                            <el-button size="mini" circle type="primary" class="el-icon-edit"
-                                       @click="handleEdit(scope.row)">
+                            <el-button size="mini"
+                                       @click="handleEdit(scope.row)">编辑
                             </el-button>
-                            <el-button size="mini" circle type="primary" class="el-icon-menu"
-                                       @click="handleResources(scope.row)">
-                            </el-button>
-                            <el-button size="mini" circle type="primary" class="el-icon-user-solid"
-                                       @click="handleUser(scope.row)">
-                            </el-button>
-                            <el-button size="mini" circle type="danger" class="el-icon-delete"
-                                       @click="handleDelete(scope.row)">
+                            <el-button size="mini" type="danger"
+                                       @click="handleDelete(scope.row)">删除
                             </el-button>
                         </template>
                     </el-table-column>
@@ -78,55 +69,40 @@
             </div>
         </div>
         <!--弹窗-->
-        <!--编辑角色-->
         <el-dialog v-el-drag-dialog
                    v-if="showEditDialog"
                    :append-to-body="true"
-                   title="编辑角色"
+                   title="编辑岗位"
                    :visible.sync="showEditDialog"
-                   width="35%">
-            <edit-role :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
-                       :editData="editData"></edit-role>
+                   width="40%">
+            <edit-job :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
+                      :editData="editData"></edit-job>
         </el-dialog>
-        <!--分配菜单-->
-        <el-dialog v-el-drag-dialog
-                   v-if="showResourcesDialog"
-                   :append-to-body="true"
-                   title="分配菜单资源"
-                   :visible.sync="showResourcesDialog"
-                   width="20%">
-            <edit-role-resources :showDialog.sync=showResourcesDialog
-                                 :editData="editData"></edit-role-resources>
-        </el-dialog>
-        <!--分配用户-->
-        <el-dialog v-el-drag-dialog
-                   v-if="showUserDialog"
-                   :append-to-body="true"
-                   title="分配用户"
-                   :visible.sync="showUserDialog"
-                   width="75%">
-            <edit-role-user :showDialog.sync=showUserDialog
-                            :editData="editData"></edit-role-user>
-        </el-dialog>
-
     </div>
-
 </template>
 
 <script>
     import elDragDialog from '@/directives/el-drag-dialog';
-    import EditRole from "./editRole";
-    import EditRoleResources from "./editRoleResources";
-    import EditRoleUser from "./editRoleUser";
-
+    import EditJob from "./editJob";
     export default {
-        name: "roleManager",
-        components: {EditRoleUser, EditRoleResources, EditRole},
+        name: "jobManager",
+        components: {EditJob},
         directives: {elDragDialog},
         data() {
             return {
-                filter: {},//过滤条件
-                showSearch: true,//是否显示查询框
+                filter: {},//查询条件
+                data: [],//列表数据
+                showEditDialog: false,//是否显示编辑面板
+                editData: {},//被选中编辑的数据
+                isOpen: false,//展开与折叠状态 默认折叠
+                showColumns: [
+                    {label: '名称', prop: 'name', width: 180, isShow: true},
+                    {label: '编码', prop: 'code', align: 'center', width: 150, isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80,isShow: true},
+                    {label: '描述', prop: 'description',  align: 'center',  isShow: true},
+                    {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: true},
+                ],//显示的列
+                showSearch: true,//是否显示查询栏
                 dataPage: {
                     sizes: [100, 200, 300, 400],
                     size: 100,
@@ -134,28 +110,15 @@
                     total: 0,
                     records: []
                 },//表格分页数据
-                showColumns: [
-                    {label: '序号', prop: 'id', fixed: 'left', align: 'center', width: 80, isShow: false},
-                    {label: '角色名称', prop: 'name', fixed: 'left', align: 'center', width: 150, isShow: true},
-                    {label: '角色编码', prop: 'code', width: 150, align: 'center', isShow: true},
-                    {label: '角色描述', prop: 'description', isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
-                    {label: '排序', prop: 'seq', width: 80, align: 'center', isShow: false},
-                ],//显示的列
-                showEditDialog: false,//是否显示编辑面板
-                showResourcesDialog: false,//是否显示编辑菜单资源面板
-                showUserDialog: false,//是否显示编辑用户资源面板
-                editData: {},//被选中编辑的数据
             }
         },
         created() {
             this.getData();
         },
         mounted() {
-
         },
         methods: {
-            //获取用户列表数据 分页
+            //获取系统参数列表数据 分页
             getData(type, val) {
                 this.dataPage[type] = val;
                 let param = {
@@ -163,12 +126,12 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("/user/role/getRoleList", param).then(res => {
+                this.$http.post("/user/job/getJobList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                 });
             },
             //表格重新布局
-            changeColumns() {
+            changeColumns(){
                 this.$nextTick(() => {
                     this.$refs.table.doLayout();
                 });
@@ -195,13 +158,13 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('user/role/delRole', {id: data['id']}).then(res => {
+                    this.$http.post('/user/job/delJob', {id: data['id']}).then(res => {
                         if (res['data']) {
                             this.$message({
                                 message: res['msg'] || '删除成功',
                                 type: 'success'
                             });
-                            this.getData('current', this.dataPage.current);
+                            this.getData('current',this.dataPage.current);
                         } else {
                             this.$message.error(res['msg'] || '删除失败');
                         }
@@ -214,42 +177,12 @@
                 this.editData = {};
                 this.showEditDialog = true;
             },
-            //点击分配菜单
-            handleResources(data) {
-                if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
-                    data = this.$refs.table.store.states.currentRow;
-                    if (this.$utils.isEmpty(data)) {
-                        this.$message.warning("请选择一行数据");
-                    } else {
-                        this.showResourcesDialog = true;
-                        this.editData = data;
-                    }
-                } else {//说明点击的是表格内的编辑
-                    this.showResourcesDialog = true;
-                    this.editData = data;
-                }
-            },
-            //点击分配用户
-            handleUser(data) {
-                if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
-                    data = this.$refs.table.store.states.currentRow;
-                    if (this.$utils.isEmpty(data)) {
-                        this.$message.warning("请选择一行数据");
-                    } else {
-                        this.showUserDialog = true;
-                        this.editData = data;
-                    }
-                } else {//说明点击的是表格内的编辑
-                    this.showUserDialog = true;
-                    this.editData = data;
-                }
-            },
         }
     }
 </script>
 
 <style scoped lang="scss">
-    .roleManager {
+    .jobManager{
         height: 100%;
     }
 
@@ -284,7 +217,6 @@
 
         .table {
             width: 100%;
-
             .el-table {
                 height: calc(100% - 20px);
             }
@@ -297,12 +229,10 @@
 
     }
 
-    //自定义 表格列
     .columns-checkbox {
         .el-checkbox {
             display: block;
         }
 
     }
-
 </style>

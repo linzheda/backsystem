@@ -6,6 +6,8 @@
                    title="选择上级菜单"
                    :visible.sync="showPidDialog"
                    width="20%">
+            <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search"  v-model="filterText">
+            </el-input>
             <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
                      check-strictly
                      ref="tree"
@@ -15,6 +17,7 @@
                      node-key="id"
                      @check-change="treeRadio"
                      :load="loadNode"
+                     :filter-node-method="filterNode"
                      lazy></el-tree>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="showPidDialog = false">取 消</el-button>
@@ -82,6 +85,7 @@
                 },//表单数据
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
                 showPidDialog: false,//是否显示选择piddialog
+                filterText:'',//树形数据过滤关键字
             }
         },
         watch: {
@@ -89,6 +93,9 @@
                 if (value === false) {
                     this.$emit("update:showDialog", false);
                 }
+            },
+            filterText(val) {
+                this.$refs.tree.filter(val);
             }
         },
         created() {
@@ -109,6 +116,11 @@
                 if (checked) {
                     this.$refs.tree.setCheckedNodes([data]);
                 }
+            },
+            //过滤方法
+            filterNode(value,data){
+                if (!value) return true;
+                return data.label.indexOf(value) !== -1;
             },
             //获取菜单
             getPTreeByPid(pid) {

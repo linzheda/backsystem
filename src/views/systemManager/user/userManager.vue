@@ -14,6 +14,7 @@
                     </h3>
                 </div>
                 <div class="tree">
+                    <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search" v-model="filterText"></el-input>
                     <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
                              check-strictly
                              ref="tree"
@@ -22,6 +23,7 @@
                              node-key="id"
                              @check-change="orgCheckChange"
                              :load="loadNode"
+                             :filter-node-method="filterNode"
                              lazy></el-tree>
                 </div>
             </div>
@@ -159,7 +161,12 @@
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
-
+                filterText:'',//树形数据过滤关键字
+            }
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
             }
         },
         created() {
@@ -188,6 +195,11 @@
                 this.getTreeByPid(pid).then(res => {
                     resolve(res);
                 });
+            },
+            //过滤方法
+            filterNode(value,data){
+                if (!value) return true;
+                return data.label.indexOf(value) !== -1;
             },
             //组织机构勾选=变化
             orgCheckChange(data, checked) {
@@ -316,6 +328,12 @@
                         i {
                             padding: 0 5px;
                         }
+                    }
+                }
+                .tree{
+                    .el-input{
+                        width: calc(100% - 20px);
+                        margin: 5px 10px;
                     }
                 }
             }

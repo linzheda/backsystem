@@ -7,6 +7,7 @@
                    title="选择组织机构"
                    :visible.sync="showOrgDialog"
                    width="20%">
+            <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search" v-model="filterText"></el-input>
             <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
                      check-strictly
                      ref="tree"
@@ -16,6 +17,7 @@
                      node-key="id"
                      @check-change="treeRadio"
                      :load="loadNode"
+                     :filter-node-method="filterNode"
                      lazy></el-tree>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="showOrgDialog = false">取 消</el-button>
@@ -26,14 +28,36 @@
         <el-dialog v-el-drag-dialog
                    v-if="showJobDialog"
                    :append-to-body="true"
-                   title="选择组织机构"
+                   title="选择岗位"
                    :visible.sync="showJobDialog"
-                   width="20%">
+                   width="40%">
+            <div class="table" style="height: 300px">
+                <el-input  placeholder="请输入岗位名称" prefix-icon="el-icon-search" clearable
+                           v-model="filter.name" ></el-input>
+                <el-button  type="primary" icon="el-icon-search"  @click="getData('current',1)">搜索</el-button>
 
+                <el-table :data="dataPage.records" row-key="id" highlight-current-row  height=" calc(100% - 25px)" ref="table">
+                    <template v-for="item of showColumns">
+                        <el-table-column :key="item.prop" v-if="item.isShow"
+                                         :prop="item.prop" :label="item.label"
+                                         :sortable="item.sortable" :fixed="item.fixed"
+                                         :width="item.width" :align="item.align"></el-table-column>
+                    </template>
+                </el-table>
+                <el-pagination
+                        @size-change="getData('size',$event)"
+                        @current-change="getData('current',$event)"
+                        :current-page="Number(dataPage.current)"
+                        :page-sizes="dataPage.sizes"
+                        :page-size="Number(dataPage.size)"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="Number(dataPage.total)">
+                </el-pagination>
+            </div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="showJobDialog = false">取 消</el-button>
-                <el-button type="primary" @click="changeOrgid">确 定</el-button>
-        </span>
+                <el-button @click="setCurrent(null);">清空选中</el-button>
+                <el-button type="primary" @click="changeJobid">确 定</el-button>
+             </span>
         </el-dialog>
         <!--表单-->
         <el-form ref="form" label-width="6em">
@@ -60,7 +84,7 @@
                           v-model="form.orgid_text"></el-input>
             </el-form-item>
             <el-form-item label="岗位" class="wid50">
-                <el-input :disabled="true" @click.native="showJobDialog=true" suffix-icon="el-icon-search"
+                <el-input :disabled="true" @click.native="showJobDialog=true;getData('current',1)" suffix-icon="el-icon-search"
                           v-model="form.jobid_text"></el-input>
             </el-form-item>
             <el-form-item label="身份证" class="wid50">
@@ -109,24 +133,40 @@
             return {
                 form: {
                     id: null,
-                    name:'',
-                    loginname:'',
+                    name: '',
+                    loginname: '',
                     status: 1,
-                    tel:'',
-                    idcard:'',
-                    orgid:'',
-                    orgid_text:'',
-                    jobid:'',
-                    jobid_text:'',
-                    sex:1,
-                    email:'',
-                    address:'',
-                    seq:null,
-                    remark:''
+                    tel: '',
+                    idcard: '',
+                    orgid: '',
+                    orgid_text: '',
+                    jobid: '',
+                    jobid_text: '',
+                    sex: 1,
+                    email: '',
+                    address: '',
+                    seq: null,
+                    remark: ''
                 },//表单数据
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
                 showOrgDialog: false,//是否显示选择组织机构的面板
                 showJobDialog: false,//是否显示选择岗位的面板
+                filterText:'',//树形数据过滤关键字
+                dataPage: {
+                    sizes: [100, 200, 300, 400],
+                    size: 100,
+                    current: 1,
+                    total: 0,
+                    records: []
+                },//表格分页数据
+                showColumns: [
+                    {label: '名称', prop: 'name', width: 150, isShow: true},
+                    {label: '编码', prop: 'code', align: 'center', width: 100, isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80,isShow: true},
+                    {label: '描述', prop: 'description',  align: 'center',  isShow: true},
+                    {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: false},
+                ],//显示的列
+                filter:{},//岗位过滤条件
             }
         },
         watch: {
@@ -134,11 +174,13 @@
                 if (value === false) {
                     this.$emit("update:showDialog", false);
                 }
+            },
+            filterText(val) {
+                this.$refs.tree.filter(val);
             }
         },
         created() {
             this.form = Object.assign(this.form, this.editData);
-            console.log(this.form);
         },
         mounted() {
         },
@@ -158,6 +200,11 @@
                         resolve(data);
                     });
                 });
+            },
+            //过滤方法
+            filterNode(value,data){
+                if (!value) return true;
+                return data.label.indexOf(value) !== -1;
             },
             //菜单树加载
             loadNode(node, resolve) {
@@ -179,10 +226,44 @@
                     this.form['orgid'] = node[0]['id'];
                     this.form['orgid_text'] = node[0]['name'];
                 } else {
-                    this.form['pid_text'] = '';
-                    this.form['pid'] = null;
+                    this.form['orgid'] = '';
+                    this.form['orgid_text'] = null;
                 }
                 this.showOrgDialog = false;
+            },
+            //获取系统参数列表数据 分页
+            getData(type, val) {
+                this.dataPage[type] = val;
+                let param = {
+                    current: this.dataPage.current,
+                    size: this.dataPage.size,
+                };
+                param = Object.assign(param, this.filter);
+                this.$http.post("/user/job/getJobList", param).then(res => {
+                    this.dataPage = Object.assign(this.dataPage, res.data);
+                });
+            },
+            //表格重新布局
+            changeColumns(){
+                this.$nextTick(() => {
+                    this.$refs.table.doLayout();
+                });
+            },
+            //取消选中
+            setCurrent(row) {
+                this.$refs.table.setCurrentRow(row);
+            },
+            //点击修改 岗位id
+            changeJobid(){
+                let job = this.$refs.table.store.states.currentRow;
+                if (job != null) {//说明有选择
+                    this.form['jobid'] = job['id'];
+                    this.form['jobid_text'] = job['name'];
+                }else{
+                    this.form['jobid'] = null;
+                    this.form['jobid_text'] = '';
+                }
+                this.showJobDialog = false;
             },
             //提交
             onSubmit() {
@@ -219,5 +300,11 @@
     .wid50 {
         width: 50%;
         display: inline-block;
+    }
+
+    .table{
+        .el-input{
+            width: 80%;
+        }
     }
 </style>

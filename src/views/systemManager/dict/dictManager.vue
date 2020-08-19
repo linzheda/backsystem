@@ -89,9 +89,7 @@
         directives: {elDragDialog},
         data() {
             return {
-                filter: {
-                    name: '',//菜单名称
-                },//查询条件
+                filter: {},//查询条件
                 data: [],//列表数据
                 showEditDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
