@@ -96,9 +96,7 @@
         components: {EditResource},
         data() {
             return {
-                filter: {
-                    name: '',//菜单名称
-                },//查询条件
+                filter: {},//查询条件
                 data: [],//列表数据
                 showEditDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
@@ -107,7 +105,7 @@
                     {label: '菜单名称', prop: 'name',width:300, isShow: true},
                     {label: '类型', prop: 'type_text', align:'center',width:80, isShow: true},
                     {label: '路由', prop: 'route', isShow: true},
-                    {label: '等级', prop: 'rank', align:'center',sortable:'sortable', width:80,isShow: true},
+                    {label: '等级', prop: 'level', align:'center',sortable:'sortable', width:80,isShow: true},
                     {label: '排序', prop: 'seq', align:'center', sortable:'sortable',width:80,isShow: true},
                     {label: '图标', prop: 'icon', align:'center',isScope:true,width:80, isShow: true},
                 ],//显示的列
