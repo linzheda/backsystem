@@ -7,6 +7,7 @@ import utils from './utils/utils';
 import filter from './plugins/filter';
 import bus from './plugins/bus';
 import goback from './directives/goback';
+import has from './directives/has';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import animated from 'animate.css';
@@ -39,6 +40,7 @@ Vue.prototype.$utils = Vue.utils;
 Vue.prototype.$bus = bus;
 //指令
 Vue.use(goback);
+Vue.use(has);
 //过滤器
 Object.keys(filter).forEach(key => Vue.filter(key, filter[key]));
 //表单校验插件

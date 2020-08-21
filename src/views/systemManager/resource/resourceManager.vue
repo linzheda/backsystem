@@ -19,8 +19,8 @@
         <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
-                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()">新增</el-button>
-                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()">修改</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
+                    <el-button type="primary" icon="el-icon-edit"  @click="handleEdit()" v-has="'edit'">修改</el-button>
                     <el-button type="primary" icon="el-icon-sort" @click="toggleRowExpansion()">展开/折叠</el-button>
                 </div>
                 <div class="tui-right">
@@ -59,14 +59,13 @@
 
                     <el-table-column label="操作" width="180" align="center">
                         <template slot-scope="scope">
-                            <el-button
-                                    size="mini"
-                                    @click="handleEdit(scope.row)">编辑
+                            <el-button size="mini"
+                                    @click="handleEdit(scope.row)"  v-has="'edit'">编辑
                             </el-button>
                             <el-button
                                     size="mini"
                                     type="danger"
-                                    @click="handleDelete(scope.row)">删除
+                                    @click="handleDelete(scope.row)"  v-has="'delete'">删除
                             </el-button>
                         </template>
                     </el-table-column>
@@ -105,6 +104,7 @@
                     {label: '菜单名称', prop: 'name',width:300, isShow: true},
                     {label: '类型', prop: 'type_text', align:'center',width:80, isShow: true},
                     {label: '路由', prop: 'route', isShow: true},
+                    {label: '权限标识', prop: 'premissions', align:'center',sortable:'sortable', width:80,isShow: true},
                     {label: '等级', prop: 'level', align:'center',sortable:'sortable', width:80,isShow: true},
                     {label: '排序', prop: 'seq', align:'center', sortable:'sortable',width:80,isShow: true},
                     {label: '图标', prop: 'icon', align:'center',isScope:true,width:80, isShow: true},

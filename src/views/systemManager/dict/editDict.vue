@@ -145,6 +145,7 @@
                 if(node!=null){//说明有选择
                     this.form['pid_text'] = node[0]['name'];
                     this.form['pid'] = node[0]['id'];
+                    this.form['dictkey'] =this.form['dictkey']||node[0]['dictkey'];
                     this.form['level'] = node[0]['level']+1;
                 }else{
                     this.form['pid_text'] = '';

@@ -30,7 +30,7 @@
                           suffix-icon="el-icon-search"></el-input>
             </el-form-item>
             <el-form-item label="菜单类型" class="is-required">
-                <el-radio-group v-model="form.type">
+                <el-radio-group v-model="form.type" @change="changeType">
                     <el-radio v-for="item of type_list" :key="item.value" :label="item.value">{{item.name}}</el-radio>
                 </el-radio-group>
             </el-form-item>
@@ -39,6 +39,12 @@
                           data-rules="required" validate-name="name" validate-type="keyup"
                           validate-tips-required="请输入字典名称"></el-input>
                 <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
+            </el-form-item>
+            <el-form-item label="权限标识" class="wid50 is-required" v-if="form.type==3">
+                <el-input v-model="form.premissions" v-validate
+                          data-rules="required" validate-name="premissions" validate-type="keyup"
+                          validate-tips-required="请输入字典名称"></el-input>
+                <el-alert v-if="errors.get('premissions')!=null" :title="errors.get('premissions')" type="error"/>
             </el-form-item>
             <el-form-item label="显示排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
@@ -121,6 +127,7 @@
                     id:'',
                     icon:'',
                     name:'',
+                    premissions:'',
                     pid:'',
                     pid_text:'',
                     level:null,
@@ -251,6 +258,12 @@
                     this.form['pid'] =0;
                 }
                 this.showPidDialog=false;
+            },
+            //改变菜单类型
+            changeType(){
+                if(this.form.type!=3){
+                    this.$validator.removeValidateRules('premissions');
+                }
             },
             //提交
             onSubmit() {

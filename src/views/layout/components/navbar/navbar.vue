@@ -110,7 +110,7 @@
             //退出登录
             loginOut(){
                 this.$store.dispatch("loginOut").then(() => {
-                    this.$router.push({name:'login'});
+                    location.reload();
                 });
             },
             //打开修改密码

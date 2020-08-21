@@ -87,6 +87,22 @@
                 <el-input :disabled="true" @click.native="showJobDialog=true;getData('current',1)" suffix-icon="el-icon-search"
                           v-model="form.jobid_text"></el-input>
             </el-form-item>
+            <el-form-item label="标签">
+                <el-select style="width: 100%"
+                           v-model="form.tag"
+                           multiple
+                           filterable
+                           allow-create
+                           default-first-option
+                           placeholder="请选择用户标签">
+                    <el-option
+                            v-for="item in tags"
+                            :key="item.value"
+                            :label="item.name"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="身份证" class="wid50">
                 <el-input v-model="form.idcard"></el-input>
             </el-form-item>
@@ -108,6 +124,7 @@
             <el-form-item label="备注">
                 <el-input type="textarea" v-model="form.remark"></el-input>
             </el-form-item>
+
         </el-form>
         <span slot="footer" class="dialog-footer">
                 <el-button @click="showCurrentDialog = false">取 消</el-button>
@@ -146,6 +163,7 @@
                     email: '',
                     address: '',
                     seq: null,
+                    tag:'',
                     remark: ''
                 },//表单数据
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
@@ -167,6 +185,7 @@
                     {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: false},
                 ],//显示的列
                 filter:{},//岗位过滤条件
+                tags:[],//人员标签
             }
         },
         watch: {
@@ -181,10 +200,18 @@
         },
         created() {
             this.form = Object.assign(this.form, this.editData);
+            this.form['tag'] = this.$utils.isNotEmpty(this.form['tag'])?this.form['tag'].split(","):this.form['tag'];
+            this.getTags();
         },
         mounted() {
         },
         methods: {
+            //获取人员标签
+            getTags(){
+                this.$http.post('/pub/pubCtr/getDict',{key:'user_tag'}).then(res=>{
+                    this.tags = res.data;
+                })
+            },
             //根据组织机构获取数据
             getTreeByPid(pid) {
                 let param = {

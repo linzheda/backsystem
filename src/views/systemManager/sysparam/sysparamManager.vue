@@ -19,8 +19,8 @@
         <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
-                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()">新增</el-button>
-                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()">修改</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
+                    <el-button type="primary" icon="el-icon-edit"  @click="handleEdit()" v-has="'edit'">修改</el-button>
                 </div>
                 <div class="tui-right">
                     <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -49,10 +49,10 @@
                     <el-table-column label="操作" width="240" align="center" fixed="right">
                         <template slot-scope="scope">
                             <el-button size="mini"
-                                       @click="handleEdit(scope.row)">编辑
+                                       @click="handleEdit(scope.row)"  v-has="'edit'">编辑
                             </el-button>
                             <el-button size="mini" type="danger"
-                                       @click="handleDelete(scope.row)">删除
+                                       @click="handleDelete(scope.row)"  v-has="'delete'">删除
                             </el-button>
                         </template>
                     </el-table-column>

@@ -74,6 +74,7 @@
                     name:'',
                     code:'',
                     pid:'',
+                    status:1,
                     pid_text:'',
                     level:null,
                     seq:null,
