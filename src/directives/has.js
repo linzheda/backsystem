@@ -7,10 +7,21 @@ function has(value, permissions) {
         return false;
     }
     let arr = permissions.split(",");
-    for (let item of arr) {
-        if (item === value) {
-            isExist = true;
-            break;
+    //校验
+    if(value.includes('||')){
+        let values=value.split('||');
+        for (let item of arr) {
+            if (values.includes(item)) {
+                isExist = true;
+                break;
+            }
+        }
+    }else{
+        for (let item of arr) {
+            if (item === value) {
+                isExist = true;
+                break;
+            }
         }
     }
     return isExist;
@@ -22,11 +33,16 @@ export default {
     install(Vue) {
         Vue.directive('has', {
             // 当绑定元素插入到 DOM 中。
-            inserted: function (el,binding,vnode) {
+            bind: function (el,binding,vnode) {
                 // 获取页面按钮权限
                 let btnPermissionsArr = vnode.context.$route.meta.btnPermissions;
                 if (!has(binding.value, btnPermissionsArr)) {
-                    el.parentNode.removeChild(el);
+                    if(el.parentNode){
+                        el.parentNode.removeChild(el);
+                    }else{
+                        el.style.display = 'none';
+                    }
+
                 }
             }
         });

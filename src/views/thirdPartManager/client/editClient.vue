@@ -19,6 +19,9 @@
                           validate-tips-required="请输入应用标签"></el-input>
                 <el-alert v-if="errors.get('tag')!=null" :title="errors.get('tag')" type="error"/>
             </el-form-item>
+            <el-form-item label="参数">
+                <el-input v-model="form.attr" ></el-input>
+            </el-form-item>
             <el-form-item label="描述">
                 <el-input type="textarea" v-model="form.description"></el-input>
             </el-form-item>
@@ -46,6 +49,7 @@
                     id:'',
                     name:'',
                     code:'',
+                    attr:'',
                     description:''
                 },//表单数据
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog

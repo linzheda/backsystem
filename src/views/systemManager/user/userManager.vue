@@ -86,19 +86,25 @@
                                              :sortable="item.sortable" :fixed="item.fixed"
                                              :width="item.width" :align="item.align"></el-table-column>
                         </template>
-                        <el-table-column label="操作" width="240" align="center" fixed="right">
-                            <template slot-scope="scope">
-                                <el-button size="mini"
-                                        @click="handleEdit(scope.row)"  v-has="'edit'">编辑
-                                </el-button>
-                                <el-button size="mini"
-                                        @click="handleResetPwd(scope.row)">重置密码
-                                </el-button>
-                                <el-button size="mini" type="danger"
-                                        @click="handleDelete(scope.row)"  v-has="'delete'">删除
-                                </el-button>
-                            </template>
-                        </el-table-column>
+                        <div v-has="'edit||delete||awardrole||resetpwd'">
+                            <el-table-column label="操作" width="300" align="center" fixed="right" >
+                                <template slot-scope="scope">
+                                    <el-button size="mini"
+                                               @click="handleEdit(scope.row)"  v-has="'edit'">编辑
+                                    </el-button>
+                                    <el-button size="mini"
+                                               @click="handleAwardRole(scope.row)" v-has="'awardrole'">分配角色
+                                    </el-button>
+                                    <el-button size="mini"
+                                               @click="handleResetPwd(scope.row)" v-has="'resetpwd'">重置密码
+                                    </el-button>
+                                    <el-button size="mini" type="danger"
+                                               @click="handleDelete(scope.row)"  v-has="'delete'">删除
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </div>
+
                     </el-table>
                     <el-pagination
                             @size-change="getData('size',$event)"
@@ -112,7 +118,7 @@
                 </div>
             </div>
         </div>
-        <!--弹窗-->
+        <!--弹窗 编辑用户-->
         <el-dialog v-el-drag-dialog
                    v-if="showEditDialog"
                    :append-to-body="true"
@@ -122,16 +128,27 @@
             <edit-user :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
                        :editData="editData"></edit-user>
         </el-dialog>
+        <!--弹窗 分配角色-->
+        <el-dialog v-el-drag-dialog
+                   v-if="showAwardRoleDialog"
+                   :append-to-body="true"
+                   title="分配角色"
+                   :visible.sync="showAwardRoleDialog"
+                   width="75%">
+            <edit-user-role :showDialog.sync=showAwardRoleDialog @reloadData="getData('current',dataPage.current)"
+                            :editData="editData"></edit-user-role>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import EditUser from "./editUser";
     import elDragDialog from '@/directives/el-drag-dialog';
+    import EditUserRole from "./editUserRole";
     export default {
         name: "userManager",
         directives: {elDragDialog},
-        components: {EditUser},
+        components: {EditUserRole, EditUser},
         data() {
             return {
                 isOpenOrgTree: true,//是否展开组织机构树形菜单
@@ -161,6 +178,7 @@
                     {label: '邮箱', prop: 'email', width: 300,align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
+                showAwardRoleDialog: false,//是否显示分配角色面板
                 editData: {},//被选中编辑的数据
                 filterText:'',//树形数据过滤关键字
             }
@@ -303,6 +321,21 @@
                 this.editData = {};
                 this.showEditDialog = true;
             },
+            //点击分配角色
+            handleAwardRole(data){
+                if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
+                    data = this.$refs.table.store.states.currentRow;
+                    if (this.$utils.isEmpty(data)) {
+                        this.$message.warning("请选择一行数据");
+                    } else {
+                        this.showAwardRoleDialog = true;
+                        this.editData = data;
+                    }
+                } else {//说明点击的是表格内的编辑
+                    this.showAwardRoleDialog = true;
+                    this.editData = data;
+                }
+            }
 
         }
     }

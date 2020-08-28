@@ -9,7 +9,6 @@
                 ref="tree"
                 show-checkbox
                 check-strictly
-                default-expand-all
                 :default-checked-keys="defaultCheckedArr"
                 node-key="id"
                 @check-change="changeChecked"

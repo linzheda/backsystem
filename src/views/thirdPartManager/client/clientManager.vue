@@ -100,6 +100,7 @@
                     {label: '编码', prop: 'code', align: 'center', width: 150, isShow: true},
                     {label: '标识', prop: 'client_id', align: 'center', width: 300, isShow: true},
                     {label: '秘钥', prop: 'client_secret', align: 'center', width: 300, isShow: true},
+                    {label: '参数', prop: 'attr',  align: 'center',  isShow: true},
                     {label: '描述', prop: 'description',  align: 'center',  isShow: true},
                     {label: '标签', prop: 'tag', width: 80,isShow: true},
                 ],//显示的列

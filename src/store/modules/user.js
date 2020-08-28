@@ -54,7 +54,7 @@ const user = {
         },
         getMenu({commit,state}){//获取权限菜单
             return new Promise((resolve, reject) => {
-                post('user/resources/getResourcesByUserId', {userId:state.id,pid:-1}).then(data => {
+                post('user/resources/getResourcesByUserId', {userId:state.id,isn:-1,pid:-1}).then(data => {
                     let arr = [{
                         id:null,
                         path: '/dashboard',
