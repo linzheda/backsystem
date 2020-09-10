@@ -12,11 +12,27 @@
                     :table-row-key="row => row.id"
                     v-model="rightTableData">
                 <template v-slot:leftCondition="{scope}">
-                    <el-form-item label="角色名">
-                        <el-input v-model="scope.keyWord" placeholder="角色名"></el-input>
+                    <el-form-item label="名称">
+                        <el-input v-model="scope.keyWord" placeholder="请输入角色名称"></el-input>
+                    </el-form-item>
+                    <el-form-item label="标签">
+                        <el-select style="width: 100%"
+                                   v-model="scope.tag"
+                                   multiple
+                                   filterable
+                                   allow-create
+                                   default-first-option
+                                   placeholder="请选择角色标签">
+                            <el-option
+                                    v-for="item in tags"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="编码">
-                        <el-input v-model="scope.code" placeholder="编码"></el-input>
+                        <el-input v-model="scope.code" placeholder="请输入角色编码"></el-input>
                     </el-form-item>
                 </template>
                 <template v-slot:rightCondition="{scope}">
@@ -51,13 +67,15 @@
             return {
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
                 leftColumns: [
-                    {label: '角色名', prop: 'name', width: '120px'},
+                    {label: '角色名称', prop: 'name', width: '120px'},
                     {label: '编码', prop: 'code', width: '120px'},
+                    {label: '标签', prop: 'tag_text', width: '120px'},
                     {label: '描述', prop: 'description', width: '120px'},
                 ],
                 rightTableData: [],//这个用户的角色列表(会变)
                 roleListByUserId: [],//这个用户的角色列表
                 leftTableData: [],//左侧用户数据
+                tags:[],//标签
             }
         },
         watch: {
@@ -72,10 +90,17 @@
                 this.rightTableData = res;
                 [...this.roleListByUserId] = this.rightTableData;
             });
+            this.getTags();
         },
         mounted() {
         },
         methods: {
+            //获取角色标签
+            getTags(){
+                this.$http.post('/pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
+                    this.tags = res.data;
+                })
+            },
             //获取这个角色的用户列表
             getRoleListByUserId() {
                 let param = {

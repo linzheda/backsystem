@@ -6,24 +6,26 @@
                 <div class="header">
                     <h3>组织机构
                         <span class="do-icon">
-                        <i class="el-icon-edit"></i>
                         <i :class="{'el-icon-arrow-up':isOpenOrgTree==false,'el-icon-arrow-down':isOpenOrgTree}"
                            @click="allExpand"></i>
                         <i class="el-icon-refresh"></i>
                     </span>
                     </h3>
                 </div>
-                <div class="tree">
+                <div class="tree" >
                     <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search" v-model="filterText"></el-input>
-                    <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
-                             check-strictly
-                             ref="tree"
-                             show-checkbox
-                             node-key="id"
-                             @check-change="orgCheckChange"
-                             :load="loadNode"
-                             :filter-node-method="filterNode"
-                             lazy></el-tree>
+                    <div class="data">
+                        <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
+                                 check-strictly
+                                 ref="tree"
+                                 show-checkbox
+                                 node-key="id"
+                                 @check-change="orgCheckChange"
+                                 :load="loadNode"
+                                 :filter-node-method="filterNode"
+                                 lazy></el-tree>
+                    </div>
+
                 </div>
             </div>
 
@@ -398,6 +400,11 @@
                     }
                 }
                 .tree{
+                    height: calc(100% - 50px);
+                    .data{
+                        height: calc(100% - 80px);
+                        overflow-y: scroll;
+                    }
                     .el-input{
                         width: calc(100% - 20px);
                         margin: 5px 10px;

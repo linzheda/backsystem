@@ -17,12 +17,15 @@
             </div>
             <el-dropdown size="small">
                 <div class="eui-user">
-                    <img src="~@/assets/images/home/userheader1.jpg" alt="">
+                    <svg-icon icon-class="headportrait"></svg-icon>
+                    <!--<img src="~@/assets/images/home/userheader1.jpg" alt="">-->
                     <span>{{name}}</span>
                     <i class="el-icon-caret-bottom"/>
                 </div>
                 <el-dropdown-menu slot="dropdown">
+<!--
                     <el-dropdown-item>用户信息</el-dropdown-item>
+-->
                     <el-dropdown-item @click.native="openUpdatePwd()" >修改密码</el-dropdown-item>
                     <el-dropdown-item divided @click.native="loginOut()">退出</el-dropdown-item>
                 </el-dropdown-menu>
@@ -171,9 +174,10 @@
             }
 
             .eui-user {
-                img {
-                    width: 40px;
-                    height: 40px;
+                .svg-icon {
+                    width: 35px;
+                    height: 35px;
+                    color: #539dec;
                     border-radius: 10px;
                 }
 

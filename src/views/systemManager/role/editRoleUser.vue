@@ -18,6 +18,22 @@
                     <el-form-item label="电话">
                         <el-input v-model="scope.tel" placeholder="电话"></el-input>
                     </el-form-item>
+                    <el-form-item label="标签">
+                        <el-select style="width: 100%"
+                                   v-model="scope.tag"
+                                   multiple
+                                   filterable
+                                   allow-create
+                                   default-first-option
+                                   placeholder="请选择用户标签">
+                            <el-option
+                                    v-for="item in tags"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
                 </template>
                 <template v-slot:rightCondition="{scope}">
                     <el-form-item label="名称">
@@ -59,6 +75,7 @@
                 rightTableData: [],//这个角色的用户列表(会变)
                 userListByRoeId: [],//这个角色的用户列表
                 leftTableData: [],//左侧用户数据
+                tags:[],//人员标签
             }
         },
         watch: {
@@ -73,10 +90,17 @@
                 this.rightTableData = res;
                 [...this.userListByRoeId] = this.rightTableData;
             });
+            this.getTags();
         },
         mounted() {
         },
         methods: {
+            //获取人员标签
+            getTags(){
+                this.$http.post('/pub/pubCtr/getDict',{key:'user_tag'}).then(res=>{
+                    this.tags = res.data;
+                })
+            },
             //获取这个角色的用户列表
             getUserListByRoleId() {
                 let param = {

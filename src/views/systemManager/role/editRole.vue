@@ -89,7 +89,7 @@
         mounted() {
         },
         methods: {
-            //获取人员标签
+            //获取角色标签
             getTags(){
                 this.$http.post('/pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
                     this.tags = res.data;
