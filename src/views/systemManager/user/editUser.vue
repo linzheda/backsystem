@@ -12,7 +12,6 @@
                      check-strictly
                      ref="tree"
                      show-checkbox
-                     default-expand-all
                      :default-checked-keys="[form['orgid']]"
                      node-key="id"
                      @check-change="treeRadio"

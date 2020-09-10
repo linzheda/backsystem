@@ -48,12 +48,16 @@
                     </template>
                     <el-table-column label="操作" width="240" align="center" fixed="right">
                         <template slot-scope="scope">
-                            <el-button size="mini"
-                                       @click="handleEdit(scope.row)"  v-has="'edit'">编辑
-                            </el-button>
-                            <el-button size="mini" type="danger"
-                                       @click="handleDelete(scope.row)"  v-has="'delete'">删除
-                            </el-button>
+                            <el-tooltip  content="编辑" placement="top">
+                                <el-button class="el-icon-edit" circle type="primary" size="mini"
+                                           @click="handleEdit(scope.row)"  v-has="'edit'">
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip  content="删除" placement="top">
+                                <el-button circle type="danger" class="el-icon-delete" size="mini"
+                                           @click="handleDelete(scope.row)"  v-has="'delete'">
+                                </el-button>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
                 </el-table>

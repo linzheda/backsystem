@@ -19,7 +19,6 @@
                              check-strictly
                              ref="tree"
                              show-checkbox
-                             default-expand-all
                              node-key="id"
                              @check-change="orgCheckChange"
                              :load="loadNode"
@@ -48,6 +47,22 @@
                     <el-form-item label="电话号码:">
                         <el-input placeholder="请输入电话号码" prefix-icon="el-icon-search" clearable
                                   v-model="filter.tel"></el-input>
+                    </el-form-item>
+                    <el-form-item label="标签">
+                        <el-select style="width: 100%"
+                                   v-model="filter.tag"
+                                   multiple
+                                   filterable
+                                   allow-create
+                                   default-first-option
+                                   placeholder="请选择用户标签">
+                            <el-option
+                                    v-for="item in tags"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label-width="10px">
                         <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索
@@ -87,20 +102,29 @@
                                              :width="item.width" :align="item.align"></el-table-column>
                         </template>
                         <div v-has="'edit||delete||awardrole||resetpwd'">
-                            <el-table-column label="操作" width="300" align="center" fixed="right" >
+                            <el-table-column label="操作" width="200" align="center" fixed="right" >
                                 <template slot-scope="scope">
-                                    <el-button size="mini"
-                                               @click="handleEdit(scope.row)"  v-has="'edit'">编辑
-                                    </el-button>
-                                    <el-button size="mini"
-                                               @click="handleAwardRole(scope.row)" v-has="'awardrole'">分配角色
-                                    </el-button>
-                                    <el-button size="mini"
-                                               @click="handleResetPwd(scope.row)" v-has="'resetpwd'">重置密码
-                                    </el-button>
-                                    <el-button size="mini" type="danger"
-                                               @click="handleDelete(scope.row)"  v-has="'delete'">删除
-                                    </el-button>
+                                    <el-tooltip  content="编辑" placement="top">
+                                        <el-button size="mini" circle type="primary" class="el-icon-edit"
+                                                   @click="handleEdit(scope.row)"  v-has="'edit'">
+                                        </el-button>
+                                    </el-tooltip>
+                                    <el-tooltip  content="分配角色" placement="top">
+                                        <el-button size="mini" circle type="primary" class="el-icon-user-solid"
+                                                   @click="handleAwardRole(scope.row)" v-has="'awardrole'">
+                                        </el-button>
+                                    </el-tooltip>
+                                    <el-tooltip  content="重置密码" placement="top">
+                                        <el-button size="mini" circle type="primary"
+                                                   @click="handleResetPwd(scope.row)" v-has="'resetpwd'">
+                                            <svg-icon icon-class="resetpwd" ></svg-icon>
+                                        </el-button>
+                                    </el-tooltip>
+                                    <el-tooltip  content="删除" placement="top">
+                                        <el-button size="mini" circle type="danger" class="el-icon-delete"
+                                                   @click="handleDelete(scope.row)"  v-has="'delete'">
+                                        </el-button>
+                                    </el-tooltip>
                                 </template>
                             </el-table-column>
                         </div>
@@ -168,19 +192,20 @@
                     {label: '用户名', prop: 'name', fixed: 'left',align: 'center', width: 150, isShow: true},
                     {label: '登录名', prop: 'loginname', width: 150,align: 'center', isShow: true},
                     {label: '电话', prop: 'tel', width: 150,align: 'center', isShow: true},
-                    {label: '状态', prop: 'status', width: 80,align: 'center', isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80,align: 'center', isShow: true},
                     {label: '组织', prop: 'orgid_text', width: 180,align: 'center', isShow: true},
                     {label: '岗位', prop: 'jobid_text', width: 100,align: 'center', isShow: false},
                     {label: '身份证', prop: 'idcard', width: 300,align: 'center', isShow: false},
                     {label: '性别', prop: 'sex_text', width: 80,align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
-                    {label: '标签', prop: 'tag', isShow: true},
+                    {label: '标签', prop: 'tag_text', isShow: true},
                     {label: '邮箱', prop: 'email', width: 300,align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
                 showAwardRoleDialog: false,//是否显示分配角色面板
                 editData: {},//被选中编辑的数据
                 filterText:'',//树形数据过滤关键字
+                tags:[],//人员标签
             }
         },
         watch: {
@@ -190,8 +215,16 @@
         },
         created() {
             this.getData();
+            this.getTags();
+
         },
         methods: {
+            //获取人员标签
+            getTags(){
+                this.$http.post('/pub/pubCtr/getDict',{key:'user_tag'}).then(res=>{
+                    this.tags = res.data;
+                })
+            },
             //根据pid获取数据
             getTreeByPid(pid) {
                 let param = {

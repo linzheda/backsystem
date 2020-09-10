@@ -11,6 +11,22 @@
                     <el-input placeholder="请输入角色编码" prefix-icon="el-icon-search" clearable
                               v-model="filter.code"></el-input>
                 </el-form-item>
+                <el-form-item label="标签" style="width: 400px;" >
+                    <el-select style="width: 100%"
+                               v-model="filter.tag"
+                               multiple
+                               filterable
+                               allow-create
+                               default-first-option
+                               placeholder="请选择角色标签">
+                        <el-option
+                                v-for="item in tags"
+                                :key="item.value"
+                                :label="item.name"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label-width="10px">
                     <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索</el-button>
                 </el-form-item>
@@ -51,18 +67,26 @@
                     </template>
                     <el-table-column label="操作" width="180" align="center" fixed="right">
                         <template slot-scope="scope">
-                            <el-button size="mini" circle type="primary" class="el-icon-edit"
-                                       @click="handleEdit(scope.row)"  v-has="'edit'">
-                            </el-button>
-                            <el-button size="mini" circle type="primary" class="el-icon-menu"
-                                       @click="handleResources(scope.row)">
-                            </el-button>
-                            <el-button size="mini" circle type="primary" class="el-icon-user-solid"
-                                       @click="handleUser(scope.row)">
-                            </el-button>
-                            <el-button size="mini" circle type="danger" class="el-icon-delete"
-                                       @click="handleDelete(scope.row)"  v-has="'delete'">
-                            </el-button>
+                            <el-tooltip  content="编辑" placement="top">
+                                <el-button size="mini" circle type="primary" class="el-icon-edit"
+                                           @click="handleEdit(scope.row)"  v-has="'edit'">
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip  content="分配菜单" placement="top">
+                                <el-button size="mini" circle type="primary" class="el-icon-menu"
+                                           @click="handleResources(scope.row)" v-has="'awardresources'">
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip  content="分配用户" placement="top">
+                                <el-button size="mini" circle type="primary" class="el-icon-user-solid"
+                                           @click="handleUser(scope.row)" v-has="'awarduser'">
+                                </el-button>
+                            </el-tooltip>
+                            <el-tooltip  content="删除" placement="top">
+                                <el-button size="mini" circle type="danger" class="el-icon-delete"
+                                           @click="handleDelete(scope.row)"  v-has="'delete'">
+                                </el-button>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -139,6 +163,7 @@
                     {label: '角色名称', prop: 'name', fixed: 'left', align: 'center', width: 150, isShow: true},
                     {label: '角色编码', prop: 'code', width: 150, align: 'center', isShow: true},
                     {label: '角色描述', prop: 'description', isShow: true},
+                    {label: '角色标签', prop: 'tag_text', isShow: true},
                     {label: '状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
                     {label: '排序', prop: 'seq', width: 80, align: 'center', isShow: false},
                 ],//显示的列
@@ -146,15 +171,23 @@
                 showResourcesDialog: false,//是否显示编辑菜单资源面板
                 showUserDialog: false,//是否显示编辑用户资源面板
                 editData: {},//被选中编辑的数据
+                tags:[],//角色标签
             }
         },
         created() {
             this.getData();
+            this.getTags();
         },
         mounted() {
 
         },
         methods: {
+            //获取角色标签
+            getTags(){
+                this.$http.post('/pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
+                    this.tags = res.data;
+                })
+            },
             //获取用户列表数据 分页
             getData(type, val) {
                 this.dataPage[type] = val;

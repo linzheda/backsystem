@@ -10,26 +10,27 @@
                         <input type="text" class="eui-logIpt" placeholder="请输入账号" v-model="username"
                                v-validate
                                data-rules="required" validate-name="login1" validate-type="keyup"
-                               validate-tips-required="请输入用户名" /></p>
-                        <span class="error">{{errors.get('login1')}}</span>
+                               validate-tips-required="请输入用户名"/></p>
+                    <el-alert v-if="errors.get('login1')!=null" :title="errors.get('login1')" type="error"/>
                     <p>
                         <input type="password" class="eui-logIpt" v-model="password" placeholder="请输入密码"
                                v-validate data-rules="required" validate-name="login2" validate-type="keyup"
                                validate-tips-required="请输入密码"/>
-                        <span class="error">{{errors.get('login2')}}</span>
+                        <el-alert v-if="errors.get('login2')!=null" :title="errors.get('login2')" type="error"/>
                     </p>
                     <p>
-                        <input type="text" class="eui-logIpt" style="width: 180px;" placeholder="请输入验证码"/>
-                        <span ref="verificationCode"   class="verificationCode" @click="resetCode()">
+                        <input type="text" class="eui-logIpt" style="width: calc(100% - 20px - 140px);"
+                               v-model="testCode" placeholder="请输入验证码"/>
+                        <span ref="verificationCode" class="verificationCode" @click="resetCode()">
                             <canvas ref="verifyCanvas" width="100" height="40" id="verifyCanvas"></canvas>
-                            <img ref="code_img" id="code_img" >
+                            <img ref="code_img" id="code_img">
                         </span>
                         <span class="error">{{errors.get('login3')}}</span>
                     </p>
                     <a @click="login" class="eui-logBtn">登录</a>
                 </div>
             </div>
-            <div class="eui-canvas" >
+            <div class="eui-canvas">
                 <div class="eui-logo"><!--<img src="@/assets/logo.png"/>--></div>
                 <canvas id="canvas" width="100%" height="100%"/>
             </div>
@@ -39,6 +40,7 @@
 
 <script>
     import md5 from 'js-md5';
+
     export default {
         name: "login",
         data() {
@@ -46,18 +48,18 @@
                 username: '',
                 password: '',
                 //--------------------验证码-------------------------//
-                nums : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                nums: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
                     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
                     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
                 ],
-                testCode:'',//输入的验证码
-                testTrueCode:'',//绘制的验证码
+                testCode: '',//输入的验证码
+                testTrueCode: '',//绘制的验证码
             }
         },
         created() {
-            if (this.$store.getters.env=='dev'){
-                this.username='admin';
-                this.password='admin';
+            if (this.$store.getters.env == 'dev') {
+                this.username = 'admin';
+                this.password = 'admin';
             }
         },
         mounted() {
@@ -65,13 +67,14 @@
         },
         methods: {
             login() {
-                let flag=false;
-                if (this.$store.getters.env=='dev'){
-                    flag=true;
-                }else{
-                    flag=this.testTrueCode==this.testCode?true:false;
+                let flag = false;
+                if (this.$store.getters.env == 'dev') {
+                    flag = true;
+                } else {
+                    flag = this.testTrueCode.toLowerCase() == this.testCode.toLowerCase() ? true : false;
+                    console.log(flag)
                 }
-                if(!flag){
+                if (!flag) {
                     this.$message({
                         showClose: true,
                         message: '验证码错误',
@@ -91,8 +94,8 @@
                                 message: res.msg,
                                 type: 'error'
                             });
-                        }else{
-                            this.$store.dispatch('getMenu').then((res)=>{
+                        } else {
+                            this.$store.dispatch('getMenu').then((res) => {
                                 this.$router.addRoutes(res);
                                 this.$router.push({name: 'dashboard'});
                             });
@@ -101,10 +104,10 @@
                 }
             },
             // 绘制验证码
-            drawCode (str='') {
+            drawCode(str = '') {
                 let canvas = document.getElementById("verifyCanvas"); //获取HTML端画布
                 // eslint-disable-next-line no-self-assign
-                canvas.height=canvas.height;
+                canvas.height = canvas.height;
                 let context = canvas.getContext("2d"); //获取画布2D上下文
                 context.fillStyle = "cornflowerblue"; //画布填充色
                 context.fillRect(0, 0, canvas.width, canvas.height); //清空画布
@@ -133,7 +136,7 @@
                 return str;
             },
             // 随机线
-            drawline (canvas, context) {
+            drawline(canvas, context) {
                 context.moveTo(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height)); //随机线的起点x坐标是画布x坐标0位置，y坐标是画布高度的随机数
                 context.lineTo(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height)); //随机线的终点x坐标是画布宽度，y坐标是画布高度的随机数
                 context.lineWidth = 0.5; //随机线宽
@@ -141,7 +144,7 @@
                 context.stroke(); //描边，即起点描到终点
             },
             // 随机点(所谓画点其实就是画1px像素的线，方法不再赘述)
-            drawDot (canvas, context) {
+            drawDot(canvas, context) {
                 let px = Math.floor(Math.random() * canvas.width);
                 let py = Math.floor(Math.random() * canvas.height);
                 context.moveTo(px, py);
@@ -150,14 +153,14 @@
                 context.stroke();
             },
             // 绘制图片
-            convertCanvasToImage (canvas) {
+            convertCanvasToImage(canvas) {
                 document.getElementById("verifyCanvas").style.display = "none";
                 let image = document.getElementById("code_img");
                 image.src = canvas.toDataURL("image/png");
                 return image;
             },
             //绘制验证码
-            resetCode () {
+            resetCode() {
                 this.testTrueCode = this.drawCode();
             }
 
@@ -295,9 +298,14 @@
         right: 300px;
         transform: translateY(-50%);
     }
-    .verificationCode{
+
+    .verificationCode {
         display: inline-block;
         vertical-align: middle;
-        margin-left: 35px;
+        margin-left: 20px;
+    }
+
+    .el-alert {
+        margin-bottom: 10px;
     }
 </style>

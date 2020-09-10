@@ -22,6 +22,22 @@
             <el-form-item label="显示排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
+            <el-form-item label="标签">
+                <el-select style="width: 100%"
+                           v-model="form.tag"
+                           multiple
+                           filterable
+                           allow-create
+                           default-first-option
+                           placeholder="请选择角色标签">
+                    <el-option
+                            v-for="item in tags"
+                            :key="item.value"
+                            :label="item.name"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="描述">
                 <el-input type="textarea" v-model="form.description"></el-input>
             </el-form-item>
@@ -49,11 +65,13 @@
                     id:'',
                     name:'',
                     code:'',
+                    tag:'',
                     description:'',
                     status:1,
                     seq:null,
                 },//表单数据
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
+                tags:[],//标签
             }
         },
         watch: {
@@ -65,10 +83,18 @@
         },
         created() {
             this.form = Object.assign( this.form, this.editData);
+            this.form['tag'] = this.$utils.isNotEmpty(this.form['tag'])?this.form['tag'].split(","):this.form['tag'];
+            this.getTags();
         },
         mounted() {
         },
         methods: {
+            //获取人员标签
+            getTags(){
+                this.$http.post('/pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
+                    this.tags = res.data;
+                })
+            },
             //提交
             onSubmit(){
                 if(this.$validator.checkAll()){
