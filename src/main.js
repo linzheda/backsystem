@@ -4,6 +4,7 @@ import router from './router';
 import store from './store';
 import http from './plugins/http';
 import utils from './utils/utils';
+import permissions from './utils/permissions';
 import filter from './plugins/filter';
 import bus from './plugins/bus';
 import goback from './directives/goback';
@@ -36,6 +37,9 @@ Vue.use(http);
 //工具类
 Vue.utils = utils;
 Vue.prototype.$utils = Vue.utils;
+
+Vue.permissions = permissions;
+Vue.prototype.$permissions = Vue.permissions;
 //事件总线
 Vue.prototype.$bus = bus;
 //指令

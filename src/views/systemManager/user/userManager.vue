@@ -12,7 +12,7 @@
                     </span>
                     </h3>
                 </div>
-                <div class="tree" >
+                <div class="tree">
                     <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search" v-model="filterText"></el-input>
                     <div class="data">
                         <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
@@ -29,13 +29,13 @@
                 </div>
             </div>
 
-            <div class="open-close" >
+            <div class="open-close">
                 <i :class="{'el-icon-caret-left':isOpenOrgDiv,'el-icon-caret-right':isOpenOrgDiv==false}"
                    @click="isOpenOrgDiv=!isOpenOrgDiv"></i>
             </div>
         </div>
         <!--用户列表-->
-        <div class="box-right" >
+        <div class="box-right">
             <div class="header" v-if="showSearch">
                 <el-form ref="form" label-width="80px">
                     <el-form-item label="用户名称:">
@@ -77,7 +77,8 @@
                 <div class="do-box">
                     <div class="tui-left">
                         <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
-                        <el-button type="primary" icon="el-icon-edit"  @click="handleEdit()" v-has="'edit'">修改</el-button>
+                        <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改
+                        </el-button>
                     </div>
                     <div class="tui-right">
                         <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -87,7 +88,8 @@
                                     width="80"
                                     trigger="click">
                             <div class="columns-checkbox">
-                                <el-checkbox v-for="item of showColumns" @change="changeColumns" :key="item.prop" v-model="item.isShow">
+                                <el-checkbox v-for="item of showColumns" @change="changeColumns" :key="item.prop"
+                                             v-model="item.isShow">
                                     {{item.label}}
                                 </el-checkbox>
                             </div>
@@ -96,41 +98,39 @@
                     </div>
                 </div>
                 <div class="table" style="height: calc(100% - 50px)">
-                    <el-table :data="dataPage.records" row-key="id" highlight-current-row  height=" calc(100% - 20px)" ref="table">
+                    <el-table :data="dataPage.records" row-key="id" highlight-current-row height=" calc(100% - 20px)"
+                              ref="table">
                         <template v-for="item of showColumns">
                             <el-table-column :key="item.prop" v-if="item.isShow"
                                              :prop="item.prop" :label="item.label"
                                              :sortable="item.sortable" :fixed="item.fixed"
                                              :width="item.width" :align="item.align"></el-table-column>
                         </template>
-                        <div v-has="'edit||delete||awardrole||resetpwd'">
-                            <el-table-column label="操作" width="200" align="center" fixed="right" >
-                                <template slot-scope="scope">
-                                    <el-tooltip  content="编辑" placement="top">
-                                        <el-button size="mini" circle type="primary" class="el-icon-edit"
-                                                   @click="handleEdit(scope.row)"  v-has="'edit'">
-                                        </el-button>
-                                    </el-tooltip>
-                                    <el-tooltip  content="分配角色" placement="top">
-                                        <el-button size="mini" circle type="primary" class="el-icon-user-solid"
-                                                   @click="handleAwardRole(scope.row)" v-has="'awardrole'">
-                                        </el-button>
-                                    </el-tooltip>
-                                    <el-tooltip  content="重置密码" placement="top">
-                                        <el-button size="mini" circle type="primary"
-                                                   @click="handleResetPwd(scope.row)" v-has="'resetpwd'">
-                                            <svg-icon icon-class="resetpwd" ></svg-icon>
-                                        </el-button>
-                                    </el-tooltip>
-                                    <el-tooltip  content="删除" placement="top">
-                                        <el-button size="mini" circle type="danger" class="el-icon-delete"
-                                                   @click="handleDelete(scope.row)"  v-has="'delete'">
-                                        </el-button>
-                                    </el-tooltip>
-                                </template>
-                            </el-table-column>
-                        </div>
-
+                        <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
+                            <template slot-scope="scope">
+                                <el-tooltip content="编辑" placement="top">
+                                    <el-button size="mini" circle type="primary" class="el-icon-edit"
+                                               @click="handleEdit(scope.row)" v-has="'edit'">
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip content="分配角色" placement="top">
+                                    <el-button size="mini" circle type="primary" class="el-icon-user-solid"
+                                               @click="handleAwardRole(scope.row)" v-has="'awardrole'">
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip content="重置密码" placement="top">
+                                    <el-button size="mini" circle type="primary"
+                                               @click="handleResetPwd(scope.row)" v-has="'resetpwd'">
+                                        <svg-icon icon-class="resetpwd"></svg-icon>
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip content="删除" placement="top">
+                                    <el-button size="mini" circle type="danger" class="el-icon-delete"
+                                               @click="handleDelete(scope.row)" v-has="'delete'">
+                                    </el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
                     </el-table>
                     <el-pagination
                             @size-change="getData('size',$event)"
@@ -171,6 +171,7 @@
     import EditUser from "./editUser";
     import elDragDialog from '@/directives/el-drag-dialog';
     import EditUserRole from "./editUserRole";
+
     export default {
         name: "userManager",
         directives: {elDragDialog},
@@ -178,7 +179,7 @@
         data() {
             return {
                 isOpenOrgTree: true,//是否展开组织机构树形菜单
-                isOpenOrgDiv:true,//展开收起组织机构的面板
+                isOpenOrgDiv: true,//展开收起组织机构的面板
                 orgTreeData: [],//组织机构的树形菜单
                 showSearch: true,//是否显示搜索框
                 filter: {},//过滤参数
@@ -190,24 +191,25 @@
                     records: []
                 },//表格分页数据
                 showColumns: [
-                    {label: '序号', prop: 'id', fixed: 'left',align: 'center', width: 80, isShow: true},
-                    {label: '用户名', prop: 'name', fixed: 'left',align: 'center', width: 150, isShow: true},
-                    {label: '登录名', prop: 'loginname', width: 150,align: 'center', isShow: true},
-                    {label: '电话', prop: 'tel', width: 150,align: 'center', isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80,align: 'center', isShow: true},
-                    {label: '组织', prop: 'orgid_text', width: 180,align: 'center', isShow: true},
-                    {label: '岗位', prop: 'jobid_text', width: 100,align: 'center', isShow: false},
-                    {label: '身份证', prop: 'idcard', width: 300,align: 'center', isShow: false},
-                    {label: '性别', prop: 'sex_text', width: 80,align: 'center', isShow: true},
+                    {label: '序号', prop: 'id', fixed: 'left', align: 'center', width: 80, isShow: true},
+                    {label: '用户名', prop: 'name', fixed: 'left', align: 'center', width: 150, isShow: true},
+                    {label: '登录名', prop: 'loginname', width: 150, align: 'center', isShow: true},
+                    {label: '电话', prop: 'tel', width: 150, align: 'center', isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: '组织', prop: 'orgid_text', width: 180, align: 'center', isShow: true},
+                    {label: '岗位', prop: 'jobid_text', width: 100, align: 'center', isShow: false},
+                    {label: '身份证', prop: 'idcard', width: 300, align: 'center', isShow: false},
+                    {label: '性别', prop: 'sex_text', width: 80, align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
                     {label: '标签', prop: 'tag_text', isShow: true},
-                    {label: '邮箱', prop: 'email', width: 300,align: 'center', isShow: false},
+                    {label: '邮箱', prop: 'email', width: 300, align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
                 showAwardRoleDialog: false,//是否显示分配角色面板
                 editData: {},//被选中编辑的数据
-                filterText:'',//树形数据过滤关键字
-                tags:[],//人员标签
+                filterText: '',//树形数据过滤关键字
+                tags: [],//人员标签
+                btnCnt: 0,//拥有的操作个数
             }
         },
         watch: {
@@ -216,14 +218,15 @@
             }
         },
         created() {
+            this.btnCnt = this.$permissions.hasCnt('edit||delete||awardrole', this.$route.meta);
             this.getData();
             this.getTags();
 
         },
         methods: {
             //获取人员标签
-            getTags(){
-                this.$http.post('/pub/pubCtr/getDict',{key:'user_tag'}).then(res=>{
+            getTags() {
+                this.$http.post('/pub/pubCtr/getDict', {key: 'user_tag'}).then(res => {
                     this.tags = res.data;
                 })
             },
@@ -251,7 +254,7 @@
                 });
             },
             //过滤方法
-            filterNode(value,data){
+            filterNode(value, data) {
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
             },
@@ -290,7 +293,7 @@
                 });
             },
             //表格重新布局
-            changeColumns(){
+            changeColumns() {
                 this.$nextTick(() => {
                     this.$refs.table.doLayout();
                 });
@@ -311,8 +314,8 @@
                 }
             },
             //点击重置密码
-            handleResetPwd(data){
-                this.$confirm('您确定要重置'+data['name']+'的密码吗?', '提示', {
+            handleResetPwd(data) {
+                this.$confirm('您确定要重置' + data['name'] + '的密码吗?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -323,7 +326,7 @@
                                 message: res['msg'] || '重置成功',
                                 type: 'success'
                             });
-                            this.getData('current',this.dataPage.current);
+                            this.getData('current', this.dataPage.current);
                         } else {
                             this.$message.error(res['msg'] || '重置失败');
                         }
@@ -343,7 +346,7 @@
                                 message: res['msg'] || '删除成功',
                                 type: 'success'
                             });
-                            this.getData('current',this.dataPage.current);
+                            this.getData('current', this.dataPage.current);
                         } else {
                             this.$message.error(res['msg'] || '删除失败');
                         }
@@ -357,7 +360,7 @@
                 this.showEditDialog = true;
             },
             //点击分配角色
-            handleAwardRole(data){
+            handleAwardRole(data) {
                 if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
                     data = this.$refs.table.store.states.currentRow;
                     if (this.$utils.isEmpty(data)) {
@@ -381,15 +384,19 @@
         width: 100%;
         height: 100%;
         display: flex;
+
         .box-left {
             background: white;
             flex: 2;
             display: flex;
             border-radius: 5px;
+
             .content {
                 flex: 2;
+
                 .header {
                     text-align: center;
+
                     .do-icon {
                         float: right;
                         margin-right: 30px;
@@ -399,24 +406,29 @@
                         }
                     }
                 }
-                .tree{
+
+                .tree {
                     height: calc(100% - 50px);
-                    .data{
+
+                    .data {
                         height: calc(100% - 80px);
                         overflow-y: scroll;
                     }
-                    .el-input{
+
+                    .el-input {
                         width: calc(100% - 20px);
                         margin: 5px 10px;
                     }
                 }
             }
-            .open-close{
+
+            .open-close {
                 flex: 0.01;
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                i{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                i {
                     font-size: 12px;
                     background: #d0d2d5;
                     line-height: 40px;
@@ -427,8 +439,9 @@
         .box-right {
             flex: 1;
             width: 0;
-            margin-left:10px;
+            margin-left: 10px;
             padding: 0 2px;
+
             .header {
                 text-align: center;
                 background: white;
@@ -452,6 +465,7 @@
 
                 .table {
                     width: 100%;
+
                     .el-table {
                         height: calc(100% - 20px);
                     }

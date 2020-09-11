@@ -50,7 +50,7 @@
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
                     </template>
-                    <el-table-column label="操作" width="180" align="center">
+                    <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
                             <el-tooltip  content="编辑" placement="top">
                                 <el-button class="el-icon-edit" circle type="primary" size="mini"
@@ -102,9 +102,11 @@
                     {label: '排序', prop: 'seq', align:'center', sortable:'sortable',width:80,isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
+                btnCnt: 0,//拥有的操作个数
             }
         },
         created() {
+            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
             this.getTeeDataByPid(0).then(data => {
                 this.$nextTick(() => {
                     this.data = data;

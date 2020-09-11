@@ -76,17 +76,11 @@
                               validate-tips-required="请输入路径"></el-input>
                     <el-alert v-if="errors.get('route.path')!=null" :title="errors.get('route.path')" type="error"/>
                 </el-form-item>
-                <el-form-item label="名称" class="wid50 is-required">
-                    <el-input v-model="form.route.name" v-validate
-                              data-rules="required" validate-name="route.name" validate-type="keyup"
-                              validate-tips-required="请输入名称"></el-input>
-                    <el-alert v-if="errors.get('route.name')!=null" :title="errors.get('route.name')" type="error"/>
+                <el-form-item label="名称" class="wid50">
+                    <el-input v-model="form.route.name"></el-input>
                 </el-form-item>
-                <el-form-item label="组件" class="is-required">
-                    <el-input v-model="form.route.component" v-validate
-                              data-rules="required" validate-name="route.component" validate-type="keyup"
-                              validate-tips-required="请输入组件"></el-input>
-                    <el-alert v-if="errors.get('route.component')!=null" :title="errors.get('route.component')" type="error"/>
+                <el-form-item label="组件" class="wid50">
+                    <el-input v-model="form.route.component" ></el-input>
                 </el-form-item>
                 <el-form-item label="重定位" class="wid50">
                     <el-input v-model="form.route.redirect"></el-input>

@@ -1,14 +1,36 @@
 <template>
-    <div class="jobManager">
+    <div class="operLog tui-wh100">
         <div class="search" v-if="showSearch">
             <el-form ref="form" label-width="80px">
-                <el-form-item label="岗位名称:">
-                    <el-input placeholder="请输入岗位名称" prefix-icon="el-icon-search" clearable
-                              v-model="filter.name"></el-input>
+                <el-form-item label="系统模块:">
+                    <el-input placeholder="请输入系统模块" prefix-icon="el-icon-search" clearable
+                              v-model="filter.module"></el-input>
                 </el-form-item>
-                <el-form-item label="编码:">
-                    <el-input placeholder="请输入岗位编码" prefix-icon="el-icon-search" clearable
-                              v-model="filter.code"></el-input>
+                <el-form-item label="操作人员:">
+                    <el-input placeholder="请输入操作人员" prefix-icon="el-icon-search" clearable
+                              v-model="filter.operator"></el-input>
+                </el-form-item>
+                <el-form-item label="操作类型:">
+                    <el-select v-model="filter.opertype" placeholder="请选择操作类型">
+                        <el-option label="全部" value=""></el-option>
+                        <el-option v-for="item in opertype"
+                                   :key="item.value"
+                                   :label="item.name"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="操作时间">
+                    <el-date-picker
+                            v-model="filter.opertime"
+                            type="datetimerange"
+                            :picker-options="pickerOptions"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            align="right">
+                    </el-date-picker>
                 </el-form-item>
                 <el-form-item label-width="10px">
                     <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索</el-button>
@@ -19,8 +41,7 @@
         <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
-                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
-                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改</el-button>
+                    <el-button type="danger" icon="el-icon-delete" @click="handleClean()" v-has="'clean'">清空</el-button>
                 </div>
                 <div class="tui-right">
                     <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -50,13 +71,13 @@
                     </template>
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
-                            <el-tooltip content="编辑" placement="top">
-                                <el-button class="el-icon-edit" circle type="primary" size="mini"
-                                           @click="handleEdit(scope.row)" v-has="'edit'">
+                            <el-tooltip content="详情" placement="top">
+                                <el-button class="el-icon-search" circle type="primary" size="mini"
+                                           @click="handleDetail(scope.row)" v-has="'detail'">
                                 </el-button>
                             </el-tooltip>
                             <el-tooltip content="删除" placement="top">
-                                <el-button circle type="danger" class="el-icon-delete" size="mini"
+                                <el-button class="el-icon-delete" circle type="danger" size="mini"
                                            @click="handleDelete(scope.row)" v-has="'delete'">
                                 </el-button>
                             </el-tooltip>
@@ -76,37 +97,46 @@
         </div>
         <!--弹窗-->
         <el-dialog v-el-drag-dialog
-                   v-if="showEditDialog"
+                   v-if="showDetailDialog"
                    :append-to-body="true"
-                   title="编辑岗位"
-                   :visible.sync="showEditDialog"
+                   title="查看日志详情"
+                   :visible.sync="showDetailDialog"
                    width="40%">
-            <edit-job :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
-                      :editData="editData"></edit-job>
+            <log-detail :showDialog.sync="showDetailDialog" :editData="editData"></log-detail>
         </el-dialog>
     </div>
 </template>
 
 <script>
     import elDragDialog from '@/directives/el-drag-dialog';
-    import EditJob from "./editJob";
+    import LogDetail from "./logDetail";
 
     export default {
-        name: "jobManager",
-        components: {EditJob},
+        name: "operLog",
+        components: {LogDetail},
         directives: {elDragDialog},
         data() {
             return {
                 filter: {},//查询条件
                 data: [],//列表数据
-                showEditDialog: false,//是否显示编辑面板
+                showDetailDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
                 showColumns: [
-                    {label: '名称', prop: 'name', width: 180, isShow: true},
-                    {label: '编码', prop: 'code', align: 'center', width: 150, isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80, isShow: true},
-                    {label: '描述', prop: 'description', align: 'center', isShow: true},
-                    {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: true},
+                    {label: '系统模块', prop: 'module', width: 180, align: 'center', isShow: true},
+                    {label: '操作描述', prop: 'operdesc', align: 'center', width: 180, isShow: true},
+                    {label: '操作类型', prop: 'oper_type_text', width: 80, align: 'center', isShow: true},
+                    {label: '操作人', prop: 'operatorid_text', width: 100, align: 'center', isShow: true},
+                    {label: '请求地址', prop: 'requrl', align: 'center', isShow: true},
+                    {label: '操作状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: 'IP地址', prop: 'ipaddr', align: 'center', isShow: true},
+                    {
+                        label: '操作时间',
+                        prop: 'createtime',
+                        sortable: 'sortable',
+                        align: 'center',
+                        width: 200,
+                        isShow: true
+                    },
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
                 dataPage: {
@@ -116,17 +146,52 @@
                     total: 0,
                     records: []
                 },//表格分页数据
+                opertype: [],//操作类型
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                },//日期选择的快捷选项
                 btnCnt: 0,//拥有的操作个数
             }
         },
         created() {
-            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
+            this.getOperType();
             this.getData();
+            this.btnCnt = this.$permissions.hasCnt('detail||delete', this.$route.meta);
         },
         mounted() {
         },
         methods: {
-            //获取系统参数列表数据 分页
+            //获取操作类型
+            getOperType() {
+                this.$http.post('/pub/pubCtr/getDict', {key: 'oper_type'}).then(res => {
+                    this.opertype = res.data;
+                });
+            },
+            //获取列表数据 分页
             getData(type, val) {
                 this.dataPage[type] = val;
                 let param = {
@@ -134,7 +199,7 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("/user/job/getJobList", param).then(res => {
+                this.$http.post("syslog/sysLog/getOperLogList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                 });
             },
@@ -144,20 +209,10 @@
                     this.$refs.table.doLayout();
                 });
             },
-            //点击编辑
-            handleEdit(data) {
-                if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
-                    data = this.$refs.table.store.states.currentRow;
-                    if (this.$utils.isEmpty(data)) {
-                        this.$message.warning("请选择一行数据");
-                    } else {
-                        this.showEditDialog = true;
-                        this.editData = data;
-                    }
-                } else {//说明点击的是表格内的编辑
-                    this.showEditDialog = true;
-                    this.editData = data;
-                }
+            //点击查看详情
+            handleDetail(data) {
+                this.editData = data;
+                this.showDetailDialog = true;
             },
             //点击删除
             handleDelete(data) {
@@ -166,7 +221,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('/user/job/delJob', {id: data['id']}).then(res => {
+                    this.$http.post('syslog/sysLog/delLog', {id: data['id']}).then(res => {
                         if (res['data']) {
                             this.$message({
                                 message: res['msg'] || '删除成功',
@@ -180,20 +235,32 @@
                 });
 
             },
-            //点击新增
-            handleAdd() {
-                this.editData = {};
-                this.showEditDialog = true;
+            //点击清空
+            handleClean() {
+                this.$confirm('您确定要清空所有的记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$http.post('syslog/sysLog/cleanOperLog', {}).then(res => {
+                        if (res['data']) {
+                            this.$message({
+                                message: res['msg'] || '成功清空',
+                                type: 'success'
+                            });
+                            this.getData('current', this.dataPage.current);
+                        } else {
+                            this.$message.error(res['msg'] || '操作失败');
+                        }
+                    });
+                });
+
             },
         }
     }
 </script>
 
 <style scoped lang="scss">
-    .jobManager {
-        height: 100%;
-    }
-
     //搜索
     .search {
         background: white;

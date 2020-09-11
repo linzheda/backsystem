@@ -47,7 +47,7 @@
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
                     </template>
-                    <el-table-column label="操作" width="240" align="center" fixed="right">
+                    <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
                             <el-tooltip  content="编辑" placement="top">
                                 <el-button class="el-icon-edit" circle type="primary" size="mini"
@@ -116,9 +116,11 @@
                     total: 0,
                     records: []
                 },//表格分页数据
+                btnCnt: 0,//拥有的操作个数
             }
         },
         created() {
+            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
             this.getData();
         },
         mounted() {

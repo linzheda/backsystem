@@ -19,8 +19,8 @@
         <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
-                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'"  >新增</el-button>
-                    <el-button type="primary" icon="el-icon-edit"  @click="handleEdit()" v-has="'edit'">修改</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
+                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改</el-button>
                     <el-button type="primary" icon="el-icon-sort" @click="toggleRowExpansion()">展开/折叠</el-button>
                 </div>
                 <div class="tui-right">
@@ -50,16 +50,16 @@
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
                     </template>
-                    <el-table-column label="操作" width="180" align="center">
+                    <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
-                            <el-tooltip  content="编辑" placement="top">
+                            <el-tooltip content="编辑" placement="top">
                                 <el-button class="el-icon-edit" circle type="primary" size="mini"
-                                        @click="handleEdit(scope.row)"  v-has="'edit'">
+                                           @click="handleEdit(scope.row)" v-has="'edit'">
                                 </el-button>
                             </el-tooltip>
-                            <el-tooltip  content="删除" placement="top">
-                                <el-button  circle type="danger" class="el-icon-delete" size="mini"
-                                        @click="handleDelete(scope.row)"  v-has="'delete'">
+                            <el-tooltip content="删除" placement="top">
+                                <el-button circle type="danger" class="el-icon-delete" size="mini"
+                                           @click="handleDelete(scope.row)" v-has="'delete'">
                                 </el-button>
                             </el-tooltip>
                         </template>
@@ -104,9 +104,11 @@
                     {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
+                btnCnt: 0,//拥有的操作个数
             }
         },
         created() {
+            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
             this.getTreeByPid(0).then(data => {
                 this.$nextTick(() => {
                     this.data = data;
