@@ -1,26 +1,23 @@
 <template>
-    <div class="operLog tui-wh100">
+    <div class="loginLog tui-wh100">
         <div class="search" v-if="showSearch">
             <el-form ref="form" label-width="80px">
-                <el-form-item label="系统模块:">
-                    <el-input placeholder="请输入系统模块" prefix-icon="el-icon-search" clearable
-                              v-model="filter.module"></el-input>
+                <el-form-item label="登录账号:">
+                    <el-input placeholder="请输入登录账号" prefix-icon="el-icon-search" clearable
+                              v-model="filter.loginname"></el-input>
                 </el-form-item>
-                <el-form-item label="操作人员:">
-                    <el-input placeholder="请输入操作人员" prefix-icon="el-icon-search" clearable
+                <el-form-item label="登录用户:">
+                    <el-input placeholder="请输入登录用户" prefix-icon="el-icon-search" clearable
                               v-model="filter.operator"></el-input>
                 </el-form-item>
-                <el-form-item label="操作类型:">
-                    <el-select v-model="filter.opertype" placeholder="请选择操作类型">
+                <el-form-item label="登录状态:">
+                    <el-select v-model="filter.loginstatus" placeholder="请选择登录状态">
                         <el-option label="全部" value=""></el-option>
-                        <el-option v-for="item in opertype"
-                                   :key="item.value"
-                                   :label="item.name"
-                                   :value="item.value">
-                        </el-option>
+                        <el-option label="成功" value="200"></el-option>
+                        <el-option label="失败" value="500"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="操作时间:">
+                <el-form-item label="登录时间">
                     <el-date-picker
                             v-model="filter.opertime"
                             type="datetimerange"
@@ -112,7 +109,7 @@
     import LogDetail from "./logDetail";
 
     export default {
-        name: "operLog",
+        name: "loginLog",
         components: {LogDetail},
         directives: {elDragDialog},
         data() {
@@ -122,21 +119,16 @@
                 showDetailDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
                 showColumns: [
-                    {label: '系统模块', prop: 'module', width: 180, align: 'center', isShow: true},
-                    {label: '操作描述', prop: 'operdesc', align: 'center', width: 180, isShow: true},
-                    {label: '操作类型', prop: 'opertype_text', width: 80, align: 'center', isShow: true},
-                    {label: '操作人', prop: 'operatorid_text', width: 100, align: 'center', isShow: true},
-                    {label: '请求地址', prop: 'requrl', align: 'center', isShow: true},
-                    {label: '操作状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: '系统模块', prop: 'module', width: 180, align: 'center', isShow: false},
+                    {label: '操作描述', prop: 'operdesc', align: 'center', width: 180, isShow: false},
+                    {label: '操作类型', prop: 'opertype_text', width: 80, align: 'center', isShow: false},
+                    {label: '登录账号', prop: 'loginname', width: 100, align: 'center', isShow: true},
+                    {label: '登录用户', prop: 'operatorid_text', width: 100, align: 'center', isShow: true},
+                    {label: '请求地址', prop: 'requrl', align: 'center', isShow: false},
+                    {label: '操作状态', prop: 'status_text', width: 80, align: 'center', isShow: false},
+                    {label: '登录状态', prop: 'loginstatus', width: 80, align: 'center', isShow: true},
                     {label: 'IP地址', prop: 'ipaddr', align: 'center', isShow: true},
-                    {
-                        label: '操作时间',
-                        prop: 'createtime',
-                        sortable: 'sortable',
-                        align: 'center',
-                        width: 200,
-                        isShow: true
-                    },
+                    {label: '登录时间', prop: 'createtime', sortable: 'sortable', align: 'center', width: 200, isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
                 dataPage: {
@@ -146,7 +138,6 @@
                     total: 0,
                     records: []
                 },//表格分页数据
-                opertype: [],//操作类型
                 pickerOptions: {
                     shortcuts: [{
                         text: '最近一周',
@@ -175,30 +166,23 @@
                     }]
                 },//日期选择的快捷选项
                 btnCnt: 0,//拥有的操作个数
-                logtype:'oper',//日志类型
+                logtype: 'login',//日志类型
             }
         },
         created() {
-            this.getOperType();
             this.getData();
             this.btnCnt = this.$permissions.hasCnt('detail||delete', this.$route.meta);
         },
         mounted() {
         },
         methods: {
-            //获取操作类型
-            getOperType() {
-                this.$http.post('/pub/pubCtr/getDict', {key: 'oper_type'}).then(res => {
-                    this.opertype = res.data;
-                });
-            },
             //获取列表数据 分页
             getData(type, val) {
                 this.dataPage[type] = val;
                 let param = {
                     current: this.dataPage.current,
                     size: this.dataPage.size,
-                    type:this.logtype,
+                    type: this.logtype,
                 };
                 param = Object.assign(param, this.filter);
                 this.$http.post("syslog/sysLog/getLogList", param).then(res => {
@@ -244,7 +228,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('syslog/sysLog/cleanLog', {type:this.logtype}).then(res => {
+                    this.$http.post('syslog/sysLog/cleanLog', {type: this.logtype}).then(res => {
                         if (res['data']) {
                             this.$message({
                                 message: res['msg'] || '成功清空',

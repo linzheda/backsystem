@@ -1,7 +1,13 @@
+import utils from "@/utils/utils";
 class permissions {
     static hasCnt(flag,meta){
         let result = 0;
-        let arr = meta['btnPermissions'].split(",");
+        let arr;
+        if(utils.isNotEmpty(meta['btnPermissions'])){
+             arr = meta['btnPermissions'].split(",");
+        }else{
+            return 0;
+        }
         //校验
         if (flag.includes('||')) {
             let values = flag.split('||');
