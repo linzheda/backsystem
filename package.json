@@ -16,7 +16,7 @@
     "fundebug-javascript": "^2.4.0",
     "fundebug-revideo": "^0.6.2",
     "fundebug-vue": "0.0.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "js-md5": "^0.7.3",
     "node-sass": "^4.13.1",
     "nprogress": "^0.2.0",
