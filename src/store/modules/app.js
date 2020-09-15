@@ -12,6 +12,7 @@ const app = {
             state.tagsView.push(Object.assign({}, view, {
                 title: view.meta.title || 'no-name'
             }));
+            localStorage.setItem("tagsView",state.tagsView);
         },
         DELETE_TAGSVIEW: (state, view) => {
             for (let [i, v] of state.tagsView.entries()) {
@@ -20,16 +21,19 @@ const app = {
                     break
                 }
             }
+            localStorage.setItem("tagsView",state.tagsView);
         },
         DELETEOTHER_TAGSVIEW: (state, view) => {
             state.tagsView = state.tagsView.filter(v => {
                 return v.meta.affix || v.path === view.path
             });
+            localStorage.setItem("tagsView",state.tagsView);
         },
         DELETEALL_TAGSVIEW:(state)=>{
             state.tagsView = state.tagsView.filter(v => {
                 return v.meta.affix
             });
+            localStorage.setItem("tagsView",state.tagsView);
         }
 
     },

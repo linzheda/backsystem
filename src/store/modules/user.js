@@ -1,26 +1,25 @@
 import {post} from '@/plugins/http';
 import Layout from '@/views/layout'
-
+import router, { resetRouter } from '@/router'
 const user = {
     state: {
         id: '',
         token: '',
         name: '',
-        roles: [],
         menus:[],
     },
     mutations: {
         SET_ID:(state,id)=>{
             state.id=id
+            localStorage.setItem('id', id)
         },
         SET_TOKEN: (state, token) => {
             state.token = token
+            localStorage.setItem('token', token)
         },
         SET_NAME: (state, name) => {
             state.name = name
-        },
-        SET_ROLES: (state, roles) => {
-            state.roles = roles
+            localStorage.setItem('name', name)
         },
         SET_MENUS: (state, menus) => {
             state.menus = menus
@@ -30,9 +29,9 @@ const user = {
         Login({commit}, userinfo) {//登陆
             return new Promise((resolve, reject) => {
                 post('user/user/login', userinfo).then(data => {
-                    commit('SET_TOKEN', data.data.token);
                     commit('SET_ID', data.data.id);
                     commit('SET_NAME', data.data.name);
+                    commit('SET_TOKEN', data.data.token);
                     resolve(data);
                 }).catch(error => {
                     reject(error);
@@ -44,17 +43,23 @@ const user = {
         },
         loginOut({commit}) {
             return new Promise((resolve) => {
-                commit('SET_ID',null);
-                commit('SET_NAME',null);
-                commit('SET_TOKEN',null);
-                commit('SET_MENUS',null);
-                commit('SET_ROLES',null);
+                commit('SET_ID','');
+                commit('SET_NAME','');
+                commit('SET_TOKEN','');
+                commit('SET_MENUS','');
+                localStorage.clear();
+                resetRouter()
                 resolve();
             });
         },
         getMenu({commit,state}){//获取权限菜单
             return new Promise((resolve, reject) => {
-                post('user/resources/getResourcesByUserId', {userId:state.id,isn:'0.-1',pid:-1}).then(data => {
+                let param={
+                    userId: state.id||localStorage.getItem("id"),
+                    isn: '0.-1',
+                    pid: -1
+                };
+                post('user/resources/getResourcesByUserId', param).then(data => {
                     let arr = [{
                         id:null,
                         path: '/dashboard',
@@ -70,9 +75,15 @@ const user = {
                             }
                         ]
                     }];
+                    let  arr2=[
+                        {path: '/404', name: '404', component: () => import('@/views/404'), meta: { title: '404',icon:'404' }, hidden: true},
+                        {path: '*', name: '*', redirect: '/404', meta: { title: '404',icon:'404' },hidden: true},
+                    ];
                     let result= arr.concat(filterAsyncRouter(data.data));
                     commit('SET_MENUS', result);
-                    resolve(result);
+                    router.addRoutes(result);
+                    router.addRoutes(arr2);
+                    resolve();
                 }).catch(error => {
                     reject(error);
                 });

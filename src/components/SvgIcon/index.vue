@@ -1,6 +1,5 @@
 <!--svg组件 依赖于svg-sprite-loader -->
 <template>
-
   <div v-if="isExternal" :style="styleExternalIcon" class="svg-external-icon svg-icon" v-on="$listeners" />
   <svg v-else :class="svgClass" aria-hidden="true" v-on="$listeners">
     <use :href="iconName" />

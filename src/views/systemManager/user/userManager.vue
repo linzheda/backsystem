@@ -14,7 +14,7 @@
                 </div>
                 <div class="tree">
                     <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search" v-model="filterText"></el-input>
-                    <div class="data">
+                    <el-scrollbar class="data">
                         <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
                                  check-strictly
                                  ref="tree"
@@ -24,7 +24,7 @@
                                  :load="loadNode"
                                  :filter-node-method="filterNode"
                                  lazy></el-tree>
-                    </div>
+                    </el-scrollbar>
 
                 </div>
             </div>
@@ -124,6 +124,11 @@
                                         <svg-icon icon-class="resetpwd"></svg-icon>
                                     </el-button>
                                 </el-tooltip>
+                                <el-tooltip  content="调用日志" placement="top">
+                                    <el-button  circle type="primary" class="el-icon-notebook-1" size="mini"
+                                                @click="handleLog(scope.row)"  v-has="'log'">
+                                    </el-button>
+                                </el-tooltip>
                                 <el-tooltip content="删除" placement="top">
                                     <el-button size="mini" circle type="danger" class="el-icon-delete"
                                                @click="handleDelete(scope.row)" v-has="'delete'">
@@ -164,6 +169,15 @@
             <edit-user-role :showDialog.sync=showAwardRoleDialog @reloadData="getData('current',dataPage.current)"
                             :editData="editData"></edit-user-role>
         </el-dialog>
+        <!--弹窗 调用日志-->
+        <el-dialog v-el-drag-dialog
+                   v-if="showLogDialog"
+                   :append-to-body="true"
+                   title="调用日志"
+                   :visible.sync="showLogDialog"
+                   width="40%">
+            <log-timeline :showDialog.sync=showLogDialog :paramData="editData"></log-timeline>
+        </el-dialog>
     </div>
 </template>
 
@@ -171,11 +185,12 @@
     import EditUser from "./editUser";
     import elDragDialog from '@/directives/el-drag-dialog';
     import EditUserRole from "./editUserRole";
+    import LogTimeline from "../../systemMonitor/logMonitor/logTimeline";
 
     export default {
         name: "userManager",
         directives: {elDragDialog},
-        components: {EditUserRole, EditUser},
+        components: {LogTimeline, EditUserRole, EditUser},
         data() {
             return {
                 isOpenOrgTree: true,//是否展开组织机构树形菜单
@@ -206,6 +221,7 @@
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
                 showAwardRoleDialog: false,//是否显示分配角色面板
+                showLogDialog: false,//是否显示调用日志面板
                 editData: {},//被选中编辑的数据
                 filterText: '',//树形数据过滤关键字
                 tags: [],//人员标签
@@ -218,10 +234,11 @@
             }
         },
         created() {
-            this.btnCnt = this.$permissions.hasCnt('edit||delete||awardrole', this.$route.meta);
+            this.btnCnt = this.$permissions.hasCnt('edit||delete||awardrole||log', this.$route.meta);
+        },
+        mounted() {
             this.getData();
             this.getTags();
-
         },
         methods: {
             //获取人员标签
@@ -359,6 +376,13 @@
                 this.editData = {};
                 this.showEditDialog = true;
             },
+            //点击调用日志
+            handleLog(data){
+                this.showLogDialog = true;
+                this.editData ={
+                    userid:data['id']
+                };
+            },
             //点击分配角色
             handleAwardRole(data) {
                 if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
@@ -412,7 +436,7 @@
 
                     .data {
                         height: calc(100% - 80px);
-                        overflow-y: scroll;
+                        overflow-y: auto;
                     }
 
                     .el-input {

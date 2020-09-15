@@ -54,6 +54,11 @@
                                            @click="handleEdit(scope.row)"  v-has="'edit'">
                                 </el-button>
                             </el-tooltip>
+                            <el-tooltip  content="调用日志" placement="top">
+                                <el-button  circle type="primary" class="el-icon-notebook-1" size="mini"
+                                            @click="handleLog(scope.row)"  v-has="'log'">
+                                </el-button>
+                            </el-tooltip>
                             <el-tooltip  content="删除" placement="top">
                                 <el-button  circle type="danger" class="el-icon-delete" size="mini"
                                            @click="handleDelete(scope.row)"  v-has="'delete'">
@@ -83,21 +88,32 @@
             <edit-client :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
                          :editData="editData"></edit-client>
         </el-dialog>
+
+        <el-dialog v-el-drag-dialog
+                   v-if="showLogDialog"
+                   :append-to-body="true"
+                   title="调用日志"
+                   :visible.sync="showLogDialog"
+                   width="40%">
+            <log-timeline :showDialog.sync=showLogDialog :paramData="editData"></log-timeline>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import elDragDialog from '@/directives/el-drag-dialog';
     import EditClient from "./editClient";
+    import LogTimeline from "../../systemMonitor/logMonitor/logTimeline";
     export default {
         name: "clientManager",
         directives: {elDragDialog},
-        components: {EditClient},
+        components: {LogTimeline, EditClient},
         data() {
             return {
                 filter: {},//查询条件
                 data: [],//列表数据
                 showEditDialog: false,//是否显示编辑面板
+                showLogDialog: false,//是否显示日志面板
                 editData: {},//被选中编辑的数据
                 showColumns: [
                     {label: '名称', prop: 'name', width: 180, isShow: true},
@@ -120,7 +136,7 @@
             }
         },
         created() {
-            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
+            this.btnCnt = this.$permissions.hasCnt('edit||delete||log', this.$route.meta);
             this.getData();
         },
         mounted() {
@@ -179,6 +195,13 @@
                     });
                 });
 
+            },
+            //点击调用日志
+            handleLog(data){
+                this.showLogDialog = true;
+                this.editData ={
+                    client_id:data['client_id']
+                };
             },
             //点击新增
             handleAdd() {

@@ -1,18 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import store from '@/store'
-
+import NProgress from 'nprogress' // progress bar
+import 'nprogress/nprogress.css' // progress bar style
+NProgress.configure({showSpinner: false}) // NProgress Configuration
 Vue.use(Router);
 
 let routes = [
-    {path: '*', name: '*', redirect: '/404'},
-    {path: '/404', name: '404', component: () => import('@/views/404')},
+
     {
         path: '/',
         name: '/',
         redirect: '/login',
         component: () => import('@/views/user/login/login'),
-        meta: {keepAlive: false,requireLogin:false}
+        meta: {keepAlive: false, requireLogin: false}
     },
 ];
 const routerContext = require.context('./', true, /\.js$/);
@@ -54,7 +55,7 @@ const scrollBehavior = function (to, from, savedPosition) {
         }
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve({ x: 0, y: to.meta.savedPosition ||0})
+                resolve({x: 0, y: to.meta.savedPosition || 0})
             }, 300)
         });
     }
@@ -70,25 +71,50 @@ const history = window.sessionStorage;
 history.clear();
 
 myRouter.beforeEach((to, from, next) => {
-    let isNeedLogin=true;
-    if(to.meta.requireLogin!=null&&to.meta.requireLogin===false){
-        isNeedLogin=false;
+    NProgress.start();//页面加载进度条
+    let isNeedLogin = true;
+    if (to.meta.requireLogin != null && to.meta.requireLogin === false) {
+        isNeedLogin = false;
     }
-    if(isNeedLogin){//需要拦截
-       if(store.getters.token!=null&& store.getters.id){
-           next();
-       }else{
-           next({
-               name: '/'
-           });
-       }
-    }else{
+    if (isNeedLogin) {//需要拦截
+        if (store.getters.token != null && store.getters.id != null) {
+            if (store.getters.menus == null || store.getters.menus.length == 0) {
+                store.dispatch('getMenu').then(() => {
+                    let name = to.path.substring(to.path.lastIndexOf('/') + 1);
+                    let view = {
+                        path: "/dashboard/index",
+                        name: "dashboard",
+                        meta: {
+                            affix: true,
+                            icon: "home",
+                            keepAlive: true,
+                            title: "首页",
+                        }
+                    };
+                    store.dispatch('addTagsView', view)
+                    next({name: name});
+                });
+            } else {
+                next();
+            }
+        } else {
+            next({
+                name: '/'
+            });
+        }
+    } else {
         next();
     }
 });
 
+myRouter.afterEach(() => {
+    // finish progress bar
+    NProgress.done()
+})
+
 export function resetRouter() {
-    myRouter.replace('/login');
+    const newRouter = createRouter()
+    myRouter.matcher = newRouter.matcher // reset router
 }
 
 export default myRouter

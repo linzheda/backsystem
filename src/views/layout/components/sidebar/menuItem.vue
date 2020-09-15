@@ -1,12 +1,16 @@
 <template>
     <el-menu-item v-if="hasOneShowingChild(menuItem.children,menuItem)" :index="onlyOneChild.name"
                   @click="goPage(onlyOneChild.name)">
-        <svg-icon class="svg-icon"  v-if="onlyOneChild.meta.icon!=null" :icon-class="onlyOneChild.meta.icon"/>
+        <template v-if="isNotEmpty(onlyOneChild.meta)">
+            <svg-icon class="svg-icon" :icon-class="onlyOneChild.meta.icon"/>
+        </template>
         <span slot="title">{{onlyOneChild.meta.title}}</span>
     </el-menu-item>
     <el-submenu v-else ref="subMenu" :index="menuItem.path">
         <template slot="title">
-            <svg-icon class="svg-icon" v-if="menuItem.meta.icon!=null" :icon-class="menuItem.meta.icon"/>
+            <template v-if="isNotEmpty(menuItem.meta)">
+                <svg-icon class="svg-icon" :icon-class="menuItem.meta.icon"/>
+            </template>
             <span slot="title">{{menuItem.meta.title}}</span>
         </template>
         <menu-item v-for="child in menuItem.children" :menu-item="child" :key="child.path"/>
@@ -30,6 +34,9 @@
         mounted() {
         },
         methods: {
+            isNotEmpty(obj){
+                return this.$utils.isNotEmpty(obj['icon']);
+            },
             hasOneShowingChild(children = [], parent) {//判断是否只有一个孩子节点
                 if (children == null) {
                     children = [];
@@ -52,7 +59,9 @@
                 return false
             },
             goPage(name) {//进入对应的页面
-                this.$router.push({name: name, params: this.menuItem.meta});
+                if (this.$route.name!=name){
+                    this.$router.push({name: name, params: this.menuItem.meta});
+                }
             },
         }
     }

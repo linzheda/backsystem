@@ -1,29 +1,32 @@
 <template>
     <div class="logDetail tui-wh100">
         <el-form ref="form" label-width="6em">
-            <el-form-item label="系统模块" class="wid50">
+            <el-form-item label="系统模块:" class="wid50">
                 <span>{{form.module}}</span>
             </el-form-item>
-            <el-form-item label="操作描述" class="wid50" >
+            <el-form-item label="操作描述:" class="wid50" >
                 <span>{{form.operdesc}}</span>
             </el-form-item>
-            <el-form-item label="登录信息"  >
+            <el-form-item label="登录信息:" class="wid50"   >
                 <span>{{form.operatorid_text}}{{"/"+form.ipaddr}}</span>
             </el-form-item>
-            <el-form-item label="请求地址"  >
+            <el-form-item label="请求时间:" class="wid50" >
+                <span>{{form.createtime}}</span>
+            </el-form-item>
+            <el-form-item label="请求地址:"  >
                 <span>{{form.requrl}}</span>
             </el-form-item>
-            <el-form-item label="请求方式"  class="wid50" >
+            <el-form-item label="请求方式:"  class="wid50" >
                 <span>{{form.reqtype}}</span>
             </el-form-item>
-            <el-form-item label="操作类型" class="wid50" >
+            <el-form-item label="操作类型:" class="wid50" >
                 <span>{{form.opertype_text}}</span>
             </el-form-item>
-            <el-form-item label="操作方法"  >
+            <el-form-item label="操作方法:"  >
                 <span>{{form.reqmethod}}</span>
             </el-form-item>
             <el-form-item label="状态"  >
-                <span>{{form.status_text}}</span>
+                <el-tag :type="form.status===1?'success':'danger'"  >{{form.status_text}}</el-tag>
             </el-form-item>
             <el-form-item label="请求参数">
                 <el-input type="textarea" v-model="form.reqparam" disabled></el-input>
