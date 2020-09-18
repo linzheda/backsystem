@@ -14,27 +14,34 @@
             <el-timeline v-infinite-scroll="load" infinite-scroll-disabled="disabled">
                 <el-timeline-item v-for="(item,index) in timelineData " :key="index" :timestamp="item.createtime"
                                   placement="top">
-                    <el-card v-if="type===1">
+                    <el-card >
                         <h4>{{item.module}}=>{{item.operdesc}}
                             <el-tag :type="item.status===1?'success':'danger'" effect="dark" >{{item.status_text}}</el-tag>
                         </h4>
-                        <p>{{item.operatorid_text}}于{{item.createtime}}操作
-                            <el-tooltip content="查看详细日志" placement="top"  >
-                                <el-button type="primary" icon="el-icon-search" circle  size="mini" @click="handleLogDetail(item)"></el-button>
+                        <p v-if="type===1">
+                            {{item.operatorid_text}}于{{item.createtime}}操作
+                            <el-tooltip content="查看详细日志" placement="top">
+                                <el-button type="primary" icon="el-icon-search" circle size="mini"
+                                           @click="handleLogDetail(item)"></el-button>
+                            </el-tooltip>
+                        </p>
+                        <p v-if="type===2">
+                            {{item.client_id_text}}(ip地址:{{item.ipaddr}})于{{item.createtime}} 调用
+                            <el-tooltip content="查看详细日志" placement="top">
+                                <el-button type="primary" icon="el-icon-search" circle size="mini"
+                                           @click="handleLogDetail(item)"></el-button>
+                            </el-tooltip>
+                        </p>
+                        <p v-if="type===3">
+                            {{item.client_id_text!=null?item.client_id_text:item.operatorid_text}}
+                            (ip地址:{{item.ipaddr}})于{{item.createtime}} 调用
+                            <el-tooltip content="查看详细日志" placement="top">
+                                <el-button type="primary" icon="el-icon-search" circle size="mini"
+                                           @click="handleLogDetail(item)"></el-button>
                             </el-tooltip>
                         </p>
                     </el-card>
-                    <el-card v-if="type===2">
-                        <h4>{{item.module}}=>{{item.operdesc}}
-                            <el-tag :type="item.status===1?'success':'danger'" effect="dark">{{item.status_text}}
-                            </el-tag>
-                        </h4>
-                        <p>{{item.client_id_text}}(ip地址:{{item.ipaddr}})于{{item.createtime}} 调用
-                            <el-tooltip content="查看详细日志" placement="top"  >
-                                <el-button type="primary" icon="el-icon-search" circle  size="mini" @click="handleLogDetail(item)"></el-button>
-                            </el-tooltip>
-                        </p>
-                    </el-card>
+
                 </el-timeline-item>
             </el-timeline>
             <p v-if="loading">
@@ -105,6 +112,9 @@
             if (this.$utils.isNotEmpty(this.paramData['client_id'])) {
                 this.type = 2;
             }
+            if (this.$utils.isNotEmpty(this.paramData['url'])){
+                this.type = 3;
+            }
         },
         mounted() {
         },
@@ -121,6 +131,8 @@
                     param['userid'] = this.paramData['userid'];
                 } else if (this.type == 2) {
                     param['client_id'] = this.paramData['client_id'];
+                }else if (this.type==3){
+                    param['url'] = this.paramData['url'];
                 }
                 param = Object.assign(param, this.filter);
                 return new Promise(resolve => {

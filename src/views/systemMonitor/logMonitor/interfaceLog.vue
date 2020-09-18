@@ -133,7 +133,7 @@
                     {label: '请求应用', prop: 'client_id_text', width: 100, align: 'center', isShow: true},
                     {label: '请求地址', prop: 'requrl', align: 'center', isShow: true},
                     {label: '操作状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
-                    {label: 'IP地址', prop: 'ipaddr', align: 'center', isShow: true},
+                    {label: 'IP地址', prop: 'ipaddr', align: 'center', width: 180,isShow: true},
                     {label: '操作时间', prop: 'createtime', sortable: 'sortable', align: 'center', width: 200, isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏

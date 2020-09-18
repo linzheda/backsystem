@@ -88,7 +88,6 @@
             <edit-client :showDialog.sync=showEditDialog @reloadData="getData('current',dataPage.current)"
                          :editData="editData"></edit-client>
         </el-dialog>
-
         <el-dialog v-el-drag-dialog
                    v-if="showLogDialog"
                    :append-to-body="true"

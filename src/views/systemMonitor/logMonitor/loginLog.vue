@@ -119,12 +119,12 @@
                 showDetailDialog: false,//是否显示编辑面板
                 editData: {},//被选中编辑的数据
                 showColumns: [
-                    {label: '系统模块', prop: 'module', width: 180, align: 'center', isShow: false},
-                    {label: '操作描述', prop: 'operdesc', align: 'center', width: 180, isShow: false},
-                    {label: '操作类型', prop: 'opertype_text', width: 80, align: 'center', isShow: false},
+                    {label: '系统模块', prop: 'module', width: 180, align: 'center', isShow: true},
+                    {label: '操作描述', prop: 'operdesc', align: 'center', width: 180, isShow: true},
+                    {label: '操作类型', prop: 'opertype_text', width: 80, align: 'center', isShow: true},
                     {label: '登录账号', prop: 'loginname', width: 100, align: 'center', isShow: true},
                     {label: '登录用户', prop: 'operatorid_text', width: 100, align: 'center', isShow: true},
-                    {label: '请求地址', prop: 'requrl', align: 'center', isShow: false},
+                    {label: '请求地址', prop: 'requrl', align: 'center', isShow: true},
                     {label: '操作状态', prop: 'status_text', width: 80, align: 'center', isShow: false},
                     {label: '登录状态', prop: 'loginstatus', width: 80, align: 'center', isShow: true},
                     {label: 'IP地址', prop: 'ipaddr', align: 'center', isShow: true},
