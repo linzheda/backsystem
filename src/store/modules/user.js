@@ -41,15 +41,32 @@ const user = {
         updateToken({commit}, token){//更新token
             commit('SET_TOKEN', token);
         },
-        loginOut({commit}) {
+        loginOut({commit,state},type=0) {
             return new Promise((resolve) => {
-                commit('SET_ID','');
-                commit('SET_NAME','');
-                commit('SET_TOKEN','');
-                commit('SET_MENUS','');
-                localStorage.clear();
-                resetRouter()
-                resolve();
+                if(type==1){//说明是自己主动登出
+                    let param={
+                        id: state.id||localStorage.getItem("id"),
+                    };
+                    post('user/user/loginOut', param).then(res=>{
+                        console.log(res)
+                        commit('SET_ID','');
+                        commit('SET_NAME','');
+                        commit('SET_TOKEN','');
+                        commit('SET_MENUS','');
+                        localStorage.clear();
+                        resetRouter();
+                        resolve();
+                    });
+                }else{
+                    commit('SET_ID','');
+                    commit('SET_NAME','');
+                    commit('SET_TOKEN','');
+                    commit('SET_MENUS','');
+                    localStorage.clear();
+                    resetRouter();
+                    resolve();
+                }
+
             });
         },
         getMenu({commit,state}){//获取权限菜单

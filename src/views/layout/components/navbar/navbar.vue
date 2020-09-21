@@ -112,7 +112,7 @@
             },
             //退出登录
             loginOut(){
-                this.$store.dispatch("loginOut").then(() => {
+                this.$store.dispatch("loginOut",1).then(() => {
                     location.reload();
                 });
             },
