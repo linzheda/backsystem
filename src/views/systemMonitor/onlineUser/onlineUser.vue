@@ -41,7 +41,10 @@
         <div class="content" :style="{'height':showSearch?'calc(100% - 90px)':'calc(100% - 15px)'}">
             <div class="do-box">
                 <div class="tui-left">
-                    <el-button type="danger"  @click="handleLoginout()" v-has="'loginout'"> <svg-icon icon-class="loginout"></svg-icon>强退</el-button>
+                    <el-button type="danger" @click="handleLoginout()" v-has="'loginout'">
+                        <svg-icon icon-class="loginout"></svg-icon>
+                        强退
+                    </el-button>
                 </div>
                 <div class="tui-right">
                     <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -64,10 +67,28 @@
                 <el-table :data="dataPage.records" row-key="id" highlight-current-row height=" calc(100% - 20px)"
                           ref="table">
                     <template v-for="item of showColumns">
-                        <el-table-column :key="item.prop" v-if="item.isShow"
+                        <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
                                          :prop="item.prop" :label="item.label"
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
+                        <el-table-column v-else-if="item.isShow&&item.isScope" :key="item.prop"
+                                         :label="item.label" :align="item.align" :width="item.width">
+                            <template slot-scope="scope">
+                                <!--状态-->
+                                <template v-if="item.prop=='status_text'">
+                                    <el-tag :class="'tui-status-'+scope.row.status">
+                                        {{scope.row.status_text}}
+                                    </el-tag>
+                                </template>
+                                <!--性别-->
+                                <template v-if="item.prop=='sex_text'">
+                                    <svg-icon icon-class="woman" class="tui-sex-color-woman"
+                                              v-if="scope.row.sex_text=='女'"></svg-icon>
+                                    <svg-icon icon-class="man" class="tui-sex-color-man"
+                                              v-if="scope.row.sex_text=='男'"></svg-icon>
+                                </template>
+                            </template>
+                        </el-table-column>
                     </template>
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
@@ -114,11 +135,11 @@
                     {label: '用户名', prop: 'name', fixed: 'left', align: 'center', width: 150, isShow: true},
                     {label: '登录名', prop: 'loginname', width: 150, align: 'center', isShow: true},
                     {label: '电话', prop: 'tel', width: 150, align: 'center', isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '组织', prop: 'orgid_text', width: 180, align: 'center', isShow: true},
                     {label: '岗位', prop: 'jobid_text', width: 100, align: 'center', isShow: false},
                     {label: '身份证', prop: 'idcard', width: 300, align: 'center', isShow: false},
-                    {label: '性别', prop: 'sex_text', width: 80, align: 'center', isShow: true},
+                    {label: '性别', prop: 'sex_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
                     {label: '标签', prop: 'tag_text', isShow: true},
                     {label: '邮箱', prop: 'email', width: 300, align: 'center', isShow: false},
@@ -160,29 +181,29 @@
                 });
             },
             //点击强退
-            handleLoginout(data){
+            handleLoginout(data) {
                 if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
                     data = this.$refs.table.store.states.currentRow;
                     if (this.$utils.isEmpty(data)) {
                         this.$message.warning("请选择一行数据");
                     } else {
-                       this.logout(data['id']);
+                        this.logout(data['id']);
                     }
                 } else {//说明点击的是表格内的编辑
                     this.logout(data['id']);
                 }
             },
             //强退
-            logout(userid){
+            logout(userid) {
                 this.$confirm('您确定要强行退出这个用户吗?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then(()=>{
-                    let param={
-                        userid:userid
+                }).then(() => {
+                    let param = {
+                        userid: userid
                     };
-                    this.$http.post("user/user/loginOutById",param).then(res=>{
+                    this.$http.post("user/user/loginOutById", param).then(res => {
                         console.log(res);
                         this.getData("current", 1);
                     });
@@ -225,6 +246,7 @@
 
         .table {
             width: 100%;
+
             .el-table {
                 height: calc(100% - 20px);
             }

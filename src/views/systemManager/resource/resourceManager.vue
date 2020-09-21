@@ -20,7 +20,7 @@
             <div class="do-box">
                 <div class="tui-left">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
-                    <el-button type="primary" icon="el-icon-edit"  @click="handleEdit()" v-has="'edit'">修改</el-button>
+                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改</el-button>
                     <el-button type="primary" icon="el-icon-sort" @click="toggleRowExpansion()">展开/折叠</el-button>
                 </div>
                 <div class="tui-right">
@@ -49,24 +49,31 @@
                                          :prop="item.prop" :label="item.label"
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
-                        <el-table-column v-else-if="item.isShow&&item.isScope"  :key="item.prop"
-                                         :label="item.label" :align="item.align" :width="item.width" >
+                        <el-table-column v-else-if="item.isShow&&item.isScope" :key="item.prop"
+                                         :label="item.label" :align="item.align" :width="item.width">
                             <template slot-scope="scope">
-                                <svg-icon v-if="scope.row.icon!=null" :icon-class="scope.row.icon"></svg-icon>
+                                <!--图标-->
+                                <template  v-if="item.prop=='icon'">
+                                    <svg-icon v-if="scope.row.icon!=null" :icon-class="scope.row.icon"></svg-icon>
+                                </template>
+                                <!--类型-->
+                                <template  v-if="item.prop=='type_text'">
+                                    <el-tag :class="'tui-menu-'+scope.row.type">{{scope.row.type_text}}</el-tag>
+                                </template>
                             </template>
                         </el-table-column>
                     </template>
 
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
-                            <el-tooltip  content="编辑" placement="top">
+                            <el-tooltip content="编辑" placement="top">
                                 <el-button class="el-icon-edit" circle type="primary" size="mini"
-                                        @click="handleEdit(scope.row)"  v-has="'edit'">
+                                           @click="handleEdit(scope.row)" v-has="'edit'">
                                 </el-button>
                             </el-tooltip>
-                            <el-tooltip  content="删除" placement="top">
+                            <el-tooltip content="删除" placement="top">
                                 <el-button circle type="danger" class="el-icon-delete" size="mini"
-                                        @click="handleDelete(scope.row)"  v-has="'delete'">
+                                           @click="handleDelete(scope.row)" v-has="'delete'">
                                 </el-button>
                             </el-tooltip>
                         </template>
@@ -103,13 +110,13 @@
                 editData: {},//被选中编辑的数据
                 isOpen: false,//展开与折叠状态 默认折叠
                 showColumns: [
-                    {label: '菜单名称', prop: 'name',width:300, isShow: true},
-                    {label: '类型', prop: 'type_text', align:'center',width:80, isShow: true},
+                    {label: '菜单名称', prop: 'name', width: 300, isShow: true},
+                    {label: '类型', prop: 'type_text', align: 'center', isScope: true, width: 80, isShow: true},
                     {label: '路由', prop: 'route', isShow: true},
-                    {label: '权限标识', prop: 'premissions', align:'center',sortable:'sortable', width:80,isShow: true},
-                    {label: '等级', prop: 'level', align:'center',sortable:'sortable', width:80,isShow: true},
-                    {label: '排序', prop: 'seq', align:'center', sortable:'sortable',width:80,isShow: true},
-                    {label: '图标', prop: 'icon', align:'center',isScope:true,width:80, isShow: true},
+                    {label: '权限标识', prop: 'premissions', align: 'center', sortable: 'sortable', width: 80, isShow: true},
+                    {label: '等级', prop: 'level', align: 'center', sortable: 'sortable', width: 80, isShow: true},
+                    {label: '排序', prop: 'seq', align: 'center', sortable: 'sortable', width: 80, isShow: true},
+                    {label: '图标', prop: 'icon', align: 'center', isScope: true, width: 80, isShow: true},
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
                 btnCnt: 0,//拥有的操作个数
@@ -134,7 +141,7 @@
                     this.$http.post('user/resources/getResourcesByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
-                            item['hasChildren']=item['children_cnt'] > 0?true:false;
+                            item['hasChildren'] = item['children_cnt'] > 0 ? true : false;
                         })
                         resolve(data);
                     });

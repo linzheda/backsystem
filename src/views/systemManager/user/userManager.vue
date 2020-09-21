@@ -101,10 +101,28 @@
                     <el-table :data="dataPage.records" row-key="id" highlight-current-row height=" calc(100% - 20px)"
                               ref="table">
                         <template v-for="item of showColumns">
-                            <el-table-column :key="item.prop" v-if="item.isShow"
+                            <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
                                              :prop="item.prop" :label="item.label"
                                              :sortable="item.sortable" :fixed="item.fixed"
                                              :width="item.width" :align="item.align"></el-table-column>
+                            <el-table-column v-else-if="item.isShow&&item.isScope" :key="item.prop"
+                                             :label="item.label" :align="item.align" :width="item.width">
+                                <template slot-scope="scope">
+                                    <!--状态-->
+                                    <template v-if="item.prop=='status_text'">
+                                        <el-tag :class="'tui-status-'+scope.row.status">
+                                            {{scope.row.status_text}}
+                                        </el-tag>
+                                    </template>
+                                    <!--性别-->
+                                    <template v-if="item.prop=='sex_text'">
+                                        <svg-icon icon-class="woman" class="tui-sex-color-woman"
+                                                  v-if="scope.row.sex_text=='女'"></svg-icon>
+                                        <svg-icon icon-class="man" class="tui-sex-color-man"
+                                                  v-if="scope.row.sex_text=='男'"></svg-icon>
+                                    </template>
+                                </template>
+                            </el-table-column>
                         </template>
                         <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                             <template slot-scope="scope">
@@ -124,9 +142,9 @@
                                         <svg-icon icon-class="resetpwd"></svg-icon>
                                     </el-button>
                                 </el-tooltip>
-                                <el-tooltip  content="调用日志" placement="top">
-                                    <el-button  circle type="primary" class="el-icon-notebook-1" size="mini"
-                                                @click="handleLog(scope.row)"  v-has="'log'">
+                                <el-tooltip content="调用日志" placement="top">
+                                    <el-button circle type="primary" class="el-icon-notebook-1" size="mini"
+                                               @click="handleLog(scope.row)" v-has="'log'">
                                     </el-button>
                                 </el-tooltip>
                                 <el-tooltip content="删除" placement="top">
@@ -210,11 +228,11 @@
                     {label: '用户名', prop: 'name', fixed: 'left', align: 'center', width: 150, isShow: true},
                     {label: '登录名', prop: 'loginname', width: 150, align: 'center', isShow: true},
                     {label: '电话', prop: 'tel', width: 150, align: 'center', isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '组织', prop: 'orgid_text', width: 180, align: 'center', isShow: true},
                     {label: '岗位', prop: 'jobid_text', width: 100, align: 'center', isShow: false},
                     {label: '身份证', prop: 'idcard', width: 300, align: 'center', isShow: false},
-                    {label: '性别', prop: 'sex_text', width: 80, align: 'center', isShow: true},
+                    {label: '性别', prop: 'sex_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
                     {label: '标签', prop: 'tag_text', isShow: true},
                     {label: '邮箱', prop: 'email', width: 300, align: 'center', isShow: false},
@@ -377,10 +395,10 @@
                 this.showEditDialog = true;
             },
             //点击调用日志
-            handleLog(data){
+            handleLog(data) {
                 this.showLogDialog = true;
-                this.editData ={
-                    userid:data['id']
+                this.editData = {
+                    userid: data['id']
                 };
             },
             //点击分配角色

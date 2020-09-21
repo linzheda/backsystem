@@ -11,7 +11,7 @@
                     <el-input placeholder="请输入角色编码" prefix-icon="el-icon-search" clearable
                               v-model="filter.code"></el-input>
                 </el-form-item>
-                <el-form-item label="标签" style="width: 400px;" >
+                <el-form-item label="标签" style="width: 400px;">
                     <el-select style="width: 100%"
                                v-model="filter.tag"
                                multiple
@@ -37,7 +37,7 @@
             <div class="do-box">
                 <div class="tui-left">
                     <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
-                    <el-button type="primary" icon="el-icon-edit"  @click="handleEdit()" v-has="'edit'">修改</el-button>
+                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改</el-button>
                 </div>
                 <div class="tui-right">
                     <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -60,31 +60,42 @@
                 <el-table :data="dataPage.records" row-key="id" highlight-current-row height="calc(100% - 20px)"
                           ref="table">
                     <template v-for="item of showColumns">
-                        <el-table-column :key="item.prop" v-if="item.isShow"
+                        <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
                                          :prop="item.prop" :label="item.label"
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
+                        <el-table-column v-else-if="item.isShow&&item.isScope" :key="item.prop"
+                                         :label="item.label" :align="item.align" :width="item.width">
+                            <template slot-scope="scope">
+                                <!--状态-->
+                                <template v-if="item.prop=='status_text'">
+                                    <el-tag :class="'tui-status-'+scope.row.status">
+                                        {{scope.row.status_text}}
+                                    </el-tag>
+                                </template>
+                            </template>
+                        </el-table-column>
                     </template>
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
-                            <el-tooltip  content="编辑" placement="top">
+                            <el-tooltip content="编辑" placement="top">
                                 <el-button size="mini" circle type="primary" class="el-icon-edit"
-                                           @click="handleEdit(scope.row)"  v-has="'edit'">
+                                           @click="handleEdit(scope.row)" v-has="'edit'">
                                 </el-button>
                             </el-tooltip>
-                            <el-tooltip  content="分配菜单" placement="top">
+                            <el-tooltip content="分配菜单" placement="top">
                                 <el-button size="mini" circle type="primary" class="el-icon-menu"
                                            @click="handleResources(scope.row)" v-has="'awardresources'">
                                 </el-button>
                             </el-tooltip>
-                            <el-tooltip  content="分配用户" placement="top">
+                            <el-tooltip content="分配用户" placement="top">
                                 <el-button size="mini" circle type="primary" class="el-icon-user-solid"
                                            @click="handleUser(scope.row)" v-has="'awarduser'">
                                 </el-button>
                             </el-tooltip>
-                            <el-tooltip  content="删除" placement="top">
+                            <el-tooltip content="删除" placement="top">
                                 <el-button size="mini" circle type="danger" class="el-icon-delete"
-                                           @click="handleDelete(scope.row)"  v-has="'delete'">
+                                           @click="handleDelete(scope.row)" v-has="'delete'">
                                 </el-button>
                             </el-tooltip>
                         </template>
@@ -164,14 +175,14 @@
                     {label: '角色编码', prop: 'code', width: 150, align: 'center', isShow: true},
                     {label: '角色描述', prop: 'description', isShow: true},
                     {label: '角色标签', prop: 'tag_text', isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: '状态', prop: 'status_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '排序', prop: 'seq', width: 80, align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
                 showResourcesDialog: false,//是否显示编辑菜单资源面板
                 showUserDialog: false,//是否显示编辑用户资源面板
                 editData: {},//被选中编辑的数据
-                tags:[],//角色标签
+                tags: [],//角色标签
                 btnCnt: 0,//拥有的操作个数
             }
         },
@@ -185,8 +196,8 @@
         },
         methods: {
             //获取角色标签
-            getTags(){
-                this.$http.post('/pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
+            getTags() {
+                this.$http.post('/pub/pubCtr/getDict', {key: 'role_tag'}).then(res => {
                     this.tags = res.data;
                 })
             },

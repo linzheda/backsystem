@@ -41,10 +41,21 @@
             <div class="table" style="height: calc(100% - 50px)">
                 <el-table :data="dataPage.records" row-key="id" highlight-current-row  height=" calc(100% - 20px)" ref="table">
                     <template v-for="item of showColumns">
-                        <el-table-column :key="item.prop" v-if="item.isShow"
+                        <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
                                          :prop="item.prop" :label="item.label"
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
+                        <el-table-column v-else-if="item.isShow&&item.isScope" :key="item.prop"
+                                         :label="item.label" :align="item.align" :width="item.width">
+                            <template slot-scope="scope">
+                                <!--状态-->
+                                <template v-if="item.prop=='status_text'">
+                                    <el-tag :class="'tui-status-'+scope.row.status">
+                                        {{scope.row.status_text}}
+                                    </el-tag>
+                                </template>
+                            </template>
+                        </el-table-column>
                     </template>
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                     <template slot-scope="scope">
@@ -103,7 +114,7 @@
                     {label: '参数名称', prop: 'name', width: 180, isShow: true},
                     {label: '参数编码', prop: 'code', align: 'center', width: 150, isShow: true},
                     {label: '参数值', prop: 'value', align: 'center', width: 150, isShow: true},
-                    {label: '状态', prop: 'status_text', width: 80,isShow: true},
+                    {label: '状态', prop: 'status_text',isScope: true, width: 80,isShow: true},
                     {label: '描述', prop: 'description',  align: 'center',  isShow: true},
                     {label: '排序', prop: 'seq', sortable: 'sortable', align: 'center', width: 80, isShow: true},
                 ],//显示的列

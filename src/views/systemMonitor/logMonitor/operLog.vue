@@ -64,10 +64,27 @@
                 <el-table :data="dataPage.records" row-key="id" highlight-current-row height=" calc(100% - 20px)"
                           ref="table">
                     <template v-for="item of showColumns">
-                        <el-table-column :key="item.prop" v-if="item.isShow"
+                        <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
                                          :prop="item.prop" :label="item.label"
                                          :sortable="item.sortable" :fixed="item.fixed"
                                          :width="item.width" :align="item.align"></el-table-column>
+                        <el-table-column v-else-if="item.isShow&&item.isScope" :key="item.prop"
+                                         :label="item.label" :align="item.align" :width="item.width">
+                            <template slot-scope="scope">
+                                <!--状态-->
+                                <template v-if="item.prop=='status_text'">
+                                    <el-tag :class="'tui-status-'+scope.row.status">
+                                        {{scope.row.status_text}}
+                                    </el-tag>
+                                </template>
+                                <!--操作类型-->
+                                <template v-if="item.prop=='opertype_text'">
+                                    <el-tag :class="'tui-opertype-'+scope.row.opertype">
+                                        {{scope.row.opertype_text}}
+                                    </el-tag>
+                                </template>
+                            </template>
+                        </el-table-column>
                     </template>
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
@@ -124,10 +141,10 @@
                 showColumns: [
                     {label: '系统模块', prop: 'module', width: 180, align: 'center', isShow: true},
                     {label: '操作描述', prop: 'operdesc', align: 'center', width: 180, isShow: true},
-                    {label: '操作类型', prop: 'opertype_text', width: 80, align: 'center', isShow: true},
+                    {label: '操作类型', prop: 'opertype_text',isScope:true, width: 80, align: 'center', isShow: true},
                     {label: '操作人', prop: 'operatorid_text', width: 100, align: 'center', isShow: true},
                     {label: '请求地址', prop: 'requrl', align: 'center', isShow: true},
-                    {label: '操作状态', prop: 'status_text', width: 80, align: 'center', isShow: true},
+                    {label: '操作状态', prop: 'status_text',isScope:true, width: 80, align: 'center', isShow: true},
                     {label: 'IP地址', prop: 'ipaddr', align: 'center', isShow: true},
                     {
                         label: '操作时间',
