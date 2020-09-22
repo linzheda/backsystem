@@ -81,18 +81,22 @@ myRouter.beforeEach((to, from, next) => {
             if (store.getters.menus == null || store.getters.menus.length == 0) {
                 store.dispatch('getMenu').then(() => {
                     let name = to.path.substring(to.path.lastIndexOf('/') + 1);
-                    let view = {
-                        path: "/dashboard/index",
-                        name: "dashboard",
-                        meta: {
-                            affix: true,
-                            icon: "home",
-                            keepAlive: true,
-                            title: "首页",
-                        }
-                    };
-                    store.dispatch('addTagsView', view)
-                    next({name: name});
+                    if(name==='index'){
+                        next({path: to.path});
+                    }else {
+                        let view = {
+                            path: "/dashboard",
+                            name: "dashboard",
+                            meta: {
+                                affix: true,
+                                icon: "home",
+                                keepAlive: true,
+                                title: "首页",
+                            }
+                        };
+                        store.dispatch('addTagsView', view);
+                        next({name: name});
+                    }
                 });
             } else {
                 next();

@@ -48,13 +48,21 @@
         created() {
             if (this.$store.getters.env === 'dev') {
                 this.username = 'admin';
-                this.password = 'admin';
+                this.getSystem();
             }
         },
         mounted() {
             this.resetCode();
         },
         methods: {
+            //获取系统参数
+            getSystem(){
+                 this.$http.post('/pub/pubCtr/getSysParam',{code:'superPassword'}).then(res=>{
+                    this.password=res.data.value;
+                });
+            },
+
+            //登录
             login() {
                 let flag = false;
                 if (this.$store.getters.env === 'dev') {

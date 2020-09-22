@@ -81,7 +81,7 @@ const user = {
                         id:null,
                         path: '/dashboard',
                         component: Layout,
-                        redirect: '/dashboard/index.scss',
+                        redirect: '/dashboard/index',
                         meta:{title:'首页',icon:'home'},
                         children: [
                             {
