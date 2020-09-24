@@ -3,6 +3,7 @@ const getters = {
   env: state => state.app.env,
   imei: state => state.app.imei,
   tagsView: state => state.app.tagsView,
+  cachedViews: state => state.app.cachedViews,
   theme:state=>state.settings.theme,
   id: state => {return myGet(state.user.id,'id')},
   name: state => {return myGet(state.user.name,'name')},
