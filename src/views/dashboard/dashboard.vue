@@ -26,7 +26,7 @@
         methods: {
             //获取参数
             getSystem(){
-                this.$http.post('/pub/pubCtr/getSysParam',{code:'dashboard'}).then(res=>{
+                this.$http.post('pub/pubCtr/getSysParam',{code:'dashboard'}).then(res=>{
                     this.data=res.data;
                 });
             }

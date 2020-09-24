@@ -187,7 +187,7 @@
             getDict(key) {
                 return new Promise(resolve => {
                     let param = {key: key}
-                    this.$http.post("/pub/pubCtr/getDict", param).then(res => {
+                    this.$http.post("pub/pubCtr/getDict", param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['value'] = Number(item['value']);
@@ -231,7 +231,7 @@
                     filter_id: this.form['id']
                 };
                 return new Promise(resolve => {
-                    this.$http.post('/user/resources/getResourcesByPid', param).then(res => {
+                    this.$http.post('user/resources/getResourcesByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['leaf'] = item['children_cnt'] > 0 ? false : true;
@@ -272,7 +272,7 @@
                     let editData = Object.assign({}, this.form);
                     editData['route'] = this.routeSwitch?JSON.stringify(editData['route']):'';
                     editData['type'] = Number(editData['type']);
-                    this.$http.post("/user/resources/editResources", editData).then(res => {
+                    this.$http.post("user/resources/editResources", editData).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

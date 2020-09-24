@@ -205,7 +205,7 @@
         methods: {
             //获取操作类型
             getOperType() {
-                this.$http.post('/pub/pubCtr/getDict', {key: 'oper_type'}).then(res => {
+                this.$http.post('pub/pubCtr/getDict', {key: 'oper_type'}).then(res => {
                     this.opertype = res.data;
                 });
             },
@@ -215,7 +215,7 @@
                     current:1,
                     size:100,
                 };
-                this.$http.post('/docking/thirdPartyDocking/getThirdPartyDockingList', params).then(res => {
+                this.$http.post('docking/thirdPartyDocking/getThirdPartyDockingList', params).then(res => {
                     this.clients = res.data['records'];
                 });
             },

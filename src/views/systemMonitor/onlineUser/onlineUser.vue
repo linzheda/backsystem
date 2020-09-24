@@ -158,7 +158,7 @@
         methods: {
             //获取人员标签
             getTags() {
-                this.$http.post('/pub/pubCtr/getDict', {key: 'user_tag'}).then(res => {
+                this.$http.post('pub/pubCtr/getDict', {key: 'user_tag'}).then(res => {
                     this.tags = res.data;
                 })
             },
@@ -170,7 +170,7 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("/user/user/getOnlineUserList", param).then(res => {
+                this.$http.post("user/user/getOnlineUserList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                 });
             },

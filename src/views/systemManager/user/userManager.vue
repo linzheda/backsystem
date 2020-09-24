@@ -261,7 +261,7 @@
         methods: {
             //获取人员标签
             getTags() {
-                this.$http.post('/pub/pubCtr/getDict', {key: 'user_tag'}).then(res => {
+                this.$http.post('pub/pubCtr/getDict', {key: 'user_tag'}).then(res => {
                     this.tags = res.data;
                 })
             },
@@ -271,7 +271,7 @@
                     pid: pid,
                 };
                 return new Promise(resolve => {
-                    this.$http.post('/user/organization/getOrganizationByPid', param).then(res => {
+                    this.$http.post('user/organization/getOrganizationByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['leaf'] = item['children_cnt'] > 0 ? false : true;
@@ -323,7 +323,7 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("/user/user/getUserList", param).then(res => {
+                this.$http.post("user/user/getUserList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                 });
             },

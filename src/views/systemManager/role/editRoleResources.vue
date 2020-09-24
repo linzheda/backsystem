@@ -65,7 +65,7 @@
                     pid: pid
                 };
                 return new Promise(resolve => {
-                    this.$http.post('/user/roleResources/getResourcesListByRoleId', param).then(res => {
+                    this.$http.post('user/roleResources/getResourcesListByRoleId', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['leaf'] = item['children_cnt'] > 0 ? false : true;
@@ -117,7 +117,7 @@
                         addArr:this.addCheckedArr,
                         delArr:this.delCheckedArr,
                     };
-                    this.$http.post('/user/roleResources/updateRoleResourcesByRoleId',param).then(res => {
+                    this.$http.post('user/roleResources/updateRoleResourcesByRoleId',param).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

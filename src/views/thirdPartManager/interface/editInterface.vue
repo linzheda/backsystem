@@ -70,7 +70,7 @@
             onSubmit() {
                 if (this.$validator.checkAll()) {
                     let editData = Object.assign({}, this.form);
-                    this.$http.post("/dockinginterface/manager/editInterface", editData).then(res => {
+                    this.$http.post("dockinginterface/manager/editInterface", editData).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

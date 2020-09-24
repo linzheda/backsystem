@@ -174,7 +174,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('/user/organization/delOrganization', {id: data['id']}).then(res => {
+                    this.$http.post('user/organization/delOrganization', {id: data['id']}).then(res => {
                         if (res['data']) {
                             this.$message({
                                 message: res['msg'] || '删除成功',

@@ -125,7 +125,7 @@
                     filter_id: this.form['id']
                 };
                 return new Promise(resolve => {
-                    this.$http.post('/user/organization/getOrganizationByPid', param).then(res => {
+                    this.$http.post('user/organization/getOrganizationByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['leaf'] = item['children_cnt'] > 0 ? false : true;
@@ -152,7 +152,7 @@
             onSubmit() {
                 if(this.$validator.checkAll()){
                     let editData = Object.assign({}, this.form);
-                    this.$http.post("/user/organization/editOrganization", editData).then(res => {
+                    this.$http.post("user/organization/editOrganization", editData).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

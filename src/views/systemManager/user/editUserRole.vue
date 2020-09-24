@@ -97,7 +97,7 @@
         methods: {
             //获取角色标签
             getTags(){
-                this.$http.post('/pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
+                this.$http.post('pub/pubCtr/getDict',{key:'role_tag'}).then(res=>{
                     this.tags = res.data;
                 })
             },
@@ -107,7 +107,7 @@
                     userid: this.editData['id']
                 };
                 return new Promise(resolve => {
-                    this.$http.post("/user/roleUser/getRoleListByUserId", param).then(res => {
+                    this.$http.post("user/roleUser/getRoleListByUserId", param).then(res => {
                         resolve(res['data']);
                     });
                 })
@@ -116,7 +116,7 @@
             paginationCallBack(obj) {
                 return new Promise(((resolve, reject) => {
                     try {
-                        this.$http.post('/user/roleUser/getRoleListByCondition', obj).then(res => {
+                        this.$http.post('user/roleUser/getRoleListByCondition', obj).then(res => {
                             this.leftTableData = res.data.records;
                             resolve({total: Number(res.data.total), data: res.data.records});
                         });
@@ -145,7 +145,7 @@
                         addArr: addArr,
                         delArr: delArr,
                     };
-                    this.$http.post('/user/roleUser/updateRoleUserByUserId', param).then(res => {
+                    this.$http.post('user/roleUser/updateRoleUserByUserId', param).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

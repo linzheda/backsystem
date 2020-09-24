@@ -72,7 +72,7 @@
             onSubmit(){
                 if(this.$validator.checkAll()){
                     let editData = Object.assign({}, this.form);
-                    this.$http.post("/docking/thirdPartyDocking/editThirdPartyDocking", editData).then(res => {
+                    this.$http.post("docking/thirdPartyDocking/editThirdPartyDocking", editData).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

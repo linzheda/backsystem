@@ -197,7 +197,7 @@
         methods: {
             //获取角色标签
             getTags() {
-                this.$http.post('/pub/pubCtr/getDict', {key: 'role_tag'}).then(res => {
+                this.$http.post('pub/pubCtr/getDict', {key: 'role_tag'}).then(res => {
                     this.tags = res.data;
                 })
             },
@@ -209,7 +209,7 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("/user/role/getRoleList", param).then(res => {
+                this.$http.post("user/role/getRoleList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                 });
             },

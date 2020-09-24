@@ -13,12 +13,7 @@
         name: "appMain",
         computed: {
             cachedViews() {
-                let temp=this.$store.getters.tagsView;
-                let data=[];
-                temp.forEach(item => {
-                    data.push(item['name']);
-                });
-                return data;
+                return this.$store.getters.cachedViews;
             },
             key() {
                 return this.$route.path;

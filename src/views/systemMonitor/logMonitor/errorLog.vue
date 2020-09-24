@@ -187,7 +187,7 @@
         methods: {
             //获取操作类型
             getOperType() {
-                this.$http.post('/pub/pubCtr/getDict', {key: 'oper_type'}).then(res => {
+                this.$http.post('pub/pubCtr/getDict', {key: 'oper_type'}).then(res => {
                     this.opertype = res.data;
                 });
             },

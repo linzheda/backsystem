@@ -80,7 +80,7 @@
             onSubmit(){
                 if(this.$validator.checkAll()){
                     let editData = Object.assign({}, this.form);
-                    this.$http.post("/sysparam/sysparam/editSysparam", editData).then(res => {
+                    this.$http.post("sysparam/sysparam/editSysparam", editData).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({

@@ -51,7 +51,7 @@
         methods: {
             //获取未入库的接口
             getInterfaceUrl(){
-                this.$http.post("/dockinginterface/manager/getInterfaceUrl").then(res=>{
+                this.$http.post("dockinginterface/manager/getInterfaceUrl").then(res=>{
                     this.data=res.data;
                 });
             },
@@ -64,7 +64,7 @@
                     let param={
                         list: JSON.stringify(this.data)
                     };
-                    this.$http.post("/dockinginterface/manager/addInterfaceList",param).then(res=>{
+                    this.$http.post("dockinginterface/manager/addInterfaceList",param).then(res=>{
                         if (res['data']) {
                             this.showCurrentDialog = false;
                             this.$message({

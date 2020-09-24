@@ -144,7 +144,7 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("/sysparam/sysparam/getSysParamList", param).then(res => {
+                this.$http.post("sysparam/sysparam/getSysParamList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                 });
             },
@@ -176,7 +176,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('/sysparam/sysparam/delSysparam', {id: data['id']}).then(res => {
+                    this.$http.post('sysparam/sysparam/delSysparam', {id: data['id']}).then(res => {
                         if (res['data']) {
                             this.$message({
                                 message: res['msg'] || '删除成功',
