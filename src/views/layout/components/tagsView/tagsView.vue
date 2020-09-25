@@ -97,7 +97,6 @@
                 });
             },
             closeOthersTags() {//关闭其他
-                this.$router.push(this.selectedTag);
                 this.$store.dispatch('deleteOtherTagsView', this.selectedTag).then(() => {
                     this.moveToCurrentTag()
                 });
@@ -108,8 +107,9 @@
                 });
             },
             moveToCurrentTag() {//哪个tag被选中
+                const tags = this.$refs.tag
                 this.$nextTick(() => {
-                    for (const tag of this.tags) {
+                    for (const tag of tags) {
                         if (tag.path === this.$route.path) {
                             this.$refs.scrollPane.moveToTarget(tag);
                             this.selectedTag = tag;
