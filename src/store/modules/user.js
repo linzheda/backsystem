@@ -93,6 +93,7 @@ const user = {
                         ]
                     }];
                     let  arr2=[
+                        {path: '/redirect', component: Layout, hidden: true, children: [{path: '/redirect/:path*', component: () => import('@/views/redirect/index')}]},
                         {path: '/404', name: '404', component: () => import('@/views/404'), meta: { title: '404',icon:'404' }, hidden: true},
                         {path: '*', name: '*', redirect: '/404', meta: { title: '404',icon:'404' },hidden: true},
                     ];

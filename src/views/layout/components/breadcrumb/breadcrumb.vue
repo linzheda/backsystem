@@ -1,88 +1,76 @@
 <template>
-    <el-breadcrumb separator="/">
-        <el-breadcrumb-item v-for="(item,index) in list" :key="index" :class="{'tui-cursor':item.name!=null}" @click="goPage(item,index)" >{{item.title}}</el-breadcrumb-item>
+    <el-breadcrumb class="app-breadcrumb" separator="/">
+        <transition-group name="breadcrumb">
+            <el-breadcrumb-item v-for="(item,index) in levelList" :key="item.path">
+                <span v-if="item.redirect==='noRedirect'||index==levelList.length-1" class="no-redirect">{{ item.meta.title }}</span>
+                <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
+            </el-breadcrumb-item>
+        </transition-group>
     </el-breadcrumb>
 </template>
 
 <script>
+    import * as pathToRegexp from 'path-to-regexp'
+
     export default {
         name: "breadcrumb",
-        created() {
-        },
         data() {
             return {
-                list: []
-            }
-        },
-        mounted() {
-        },
-        methods: {
-            findPathByName(name, nodes, path) {//遍历菜单树 看看在不在菜单树里
-                if (path === undefined) {
-                    path = [];
-                }
-                for (let i = 0; i < nodes.length; i++) {
-                    let tmpPath = path.concat();
-                    if(nodes[i].children==null||nodes[i].children.length!=1){
-                        tmpPath.push({title:nodes[i]['meta']['title'],name:nodes[i]['name']});
-                    }
-                    if (name === nodes[i]['name']) {
-                        return tmpPath;
-                    }
-                    if (nodes[i].children) {
-                        let findResult = this.findPathByName(name, nodes[i].children, tmpPath);
-                        if (findResult) {
-                            return findResult;
-                        }
-                    }
-                }
-            },
-            buildList(list){//构造list
-                if(list!=null&&list.length>0){
-                    this.list=list;
-                }else{
-                    let meta=this.$route.meta;
-                    if(meta['breadcrumb']!=null){
-                        this.list=meta['breadcrumb'];
-                    }else{
-                        this.list={
-                            title:meta['title'],
-                            name:this.$route.name
-                        };
-                    }
-                }
-            },
-            goPage(item,index){//跳转
-                let num=index+1;
-                if(item['name']&&num!==this.list.length){
-                    this.$route.push({name:item['name']});
-                }
-            }
-        },
-        computed: {
-            routeName() {
-                return this.$route.name;
-            },
-            menus() {
-                return this.$store.getters.menus;
+                levelList: null
             }
         },
         watch: {
-            routeName: {
-                handler(val){
-                    let r = this.findPathByName(val, this.menus);
-                    this.buildList(r);
-                },
-                immediate: true
+            $route(route) {
+                // if you go to the redirect page, do not update the breadcrumbs
+                if (route.path.startsWith('/redirect/')) {
+                    return
+                }
+                this.getBreadcrumb()
+            }
+        },
+        created() {
+            this.getBreadcrumb()
+        },
+        methods: {
+            getBreadcrumb() {
+                // only show routes with meta.title
+                let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
+                this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
             },
-            menus(val) {
-                let r = this.findPathByName(this.routeName, val);
-                this.buildList(r);
+            isDashboard(route) {
+                const name = route && route.name
+                if (!name) {
+                    return false
+                }
+                return name.trim().toLocaleLowerCase() === 'Dashboard'.toLocaleLowerCase()
+            },
+            pathCompile(path) {
+                const { params } = this.$route
+                let toPath = pathToRegexp.compile(path)
+                return toPath(params)
+            },
+            handleLink(item) {
+                const { redirect, path } = item
+                if (redirect) {
+                    this.$router.push(redirect)
+                    return
+                }
+                this.$router.push(this.pathCompile(path))
             }
         }
     }
 </script>
 
 <style scoped lang="scss">
+    .app-breadcrumb.el-breadcrumb {
+        display: inline-block;
+        font-size: 14px;
+        line-height: 50px;
+        margin-left: 8px;
 
+        .no-redirect {
+            color: #97a8be;
+            cursor: text;
+        }
+    }
 </style>

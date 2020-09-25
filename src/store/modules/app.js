@@ -79,12 +79,6 @@ const app = {
                 resolve();
             });
         },
-        addCachedView({commit}, view) {//新增缓存
-            return new Promise((resolve) => {
-                commit('ADD_CACHED_VIEW', view);
-                resolve();
-            });
-        },
         deleteTagsView({commit, state}, view) { //删除数组存放的路由之后，需要再去刷新路由，这是一个异步的过程，需要有回掉函数，所以使用并返回promise对象，也可以让组件在调用的时候接着使用.then的方法
             return new Promise((resolve) => { //resolve方法：未来成功后回掉的方法
                 if (view.matched && view.matched.length >= 3) { // 若为三级及其以上路由关闭当前标签页时，将3级路由以上的根目录name 从list中删除
@@ -94,6 +88,13 @@ const app = {
                 commit('DEL_TAGSVIEW', view);
                 resolve([...state.tagsView]);
             });
+        },
+        delCachedView({commit, state}, view){//删除缓存
+            return new Promise(resolve => {
+                commit('DEL_CACHED_VIEW', view)
+                resolve([...state.cachedViews])
+            })
+
         },
         deleteOtherTagsView({commit, state}, view) {//关闭其他
             return new Promise(resolve => {

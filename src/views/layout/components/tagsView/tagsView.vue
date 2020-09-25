@@ -73,15 +73,21 @@
                 return tag.meta && tag.meta.affix
             },
             addViewTags() {//路由改变时执行的方法
-                if (this.$route.name) {
-                    const view = this.$route;
-                    this.$store.dispatch('addTagsView', view);
+                const { name } = this.$route
+                if (name) {
+                    this.$store.dispatch('addTagsView', this.$route)
                 }
+                return false
             },
             refreshSelectedTag(view) {//刷新
-                this.$nextTick(() => {
-                    this.$router.replace({name:view.name});
-                });
+                this.$store.dispatch('delCachedView', view).then(() => {
+                    let { fullPath } = view;
+                    this.$nextTick(() => {
+                        this.$router.replace({
+                            path: '/redirect' + fullPath
+                        })
+                    })
+                })
             },
             closeSelectedTag(view) {//关闭标签
                 this.$store.dispatch('deleteTagsView', view).then((views) => {
