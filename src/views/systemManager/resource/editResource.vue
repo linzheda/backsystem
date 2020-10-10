@@ -6,7 +6,7 @@
                    title="选择上级菜单"
                    :visible.sync="showPidDialog"
                    width="20%">
-            <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search"  v-model="filterText">
+            <el-input placeholder="输入关键字进行过滤" prefix-icon="el-icon-search" v-model="filterText">
             </el-input>
             <el-tree :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
                      check-strictly
@@ -53,10 +53,30 @@
             </el-form-item>
             <el-form-item label="图标">
                 <el-input v-model="form.icon" @blur="iconBlur()" @focus="showIcons=true"></el-input>
-                <div v-if="showIcons" class="icon-div">
-                    <span v-for="item of svgIcons" :key="item" @click="clickIcon(item)">
-                        <svg-icon :icon-class="item" class-name="disabled"/>
-                    </span>
+                <div class="icon-div">
+                    <el-tabs type="border-card" v-if="showIcons">
+                        <el-tab-pane label="通用图标">
+                            <span v-for="item of svgIcons['svgIcons']" :key="item" @click="clickIcon(item)">
+                                  <el-tooltip class="item" effect="dark" :content="item" placement="top">
+                                    <svg-icon :icon-class="item" class-name="disabled"/>
+                                  </el-tooltip>
+                            </span>
+                        </el-tab-pane>
+                        <el-tab-pane label="bs图标">
+                            <span v-for="item of svgIcons['svgBsIcons']" :key="item" @click="clickIcon(item)">
+                                  <el-tooltip class="item" effect="dark" :content="item" placement="top">
+                                    <svg-icon :icon-class="item" class-name="disabled"/>
+                                  </el-tooltip>
+                            </span>
+                        </el-tab-pane>
+                        <el-tab-pane label="app图标">
+                             <span v-for="item of svgIcons['svgAppIcons']" :key="'app_'+item" @click="clickIcon(item)">
+                               <el-tooltip class="item" effect="dark" :content="item" placement="top">
+                                    <svg-icon :icon-class="item" icon-pre="app" class-name="disabled"/>
+                               </el-tooltip>
+                             </span>
+                        </el-tab-pane>
+                    </el-tabs>
                 </div>
             </el-form-item>
             <el-form-item label="参数">
@@ -83,7 +103,8 @@
                     <el-input v-model="form.route.component" v-validate
                               data-rules="required" validate-name="route.component" validate-type="keyup"
                               validate-tips-required="请输入组件"></el-input>
-                    <el-alert v-if="errors.get('route.component')!=null" :title="errors.get('route.component')" type="error"/>
+                    <el-alert v-if="errors.get('route.component')!=null" :title="errors.get('route.component')"
+                              type="error"/>
                 </el-form-item>
                 <el-form-item label="重定位" class="wid50">
                     <el-input v-model="form.route.redirect"></el-input>
@@ -107,6 +128,7 @@
 <script>
     import svgIcons from '@/icons/svg-icons';
     import elDragDialog from '@/directives/el-drag-dialog';
+
     export default {
         name: "editResource",
         directives: {elDragDialog},
@@ -120,18 +142,18 @@
         data() {
             return {
                 form: {
-                    id:'',
-                    icon:'',
-                    name:'',
-                    premissions:'',
-                    pid:'',
-                    pid_text:'',
-                    level:null,
-                    seq:null,
-                    attr:null,
-                    description:'',
+                    id: '',
+                    icon: '',
+                    name: '',
+                    premissions: '',
+                    pid: '',
+                    pid_text: '',
+                    level: null,
+                    seq: null,
+                    attr: null,
+                    description: '',
                     type: 0,
-                    route:{}
+                    route: {}
                 },//表单数据
                 type_list: [],//类型列表,
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
@@ -139,7 +161,7 @@
                 svgIcons: svgIcons,//图标集合
                 showIcons: false,//是否显示图表
                 routeSwitch: false,//是否有路由
-                filterText:'',//树形数据过滤关键字
+                filterText: '',//树形数据过滤关键字
             }
         },
         watch: {
@@ -148,7 +170,7 @@
                     this.$emit("update:showDialog", false);
                 }
             },
-            routeSwitch(value){
+            routeSwitch(value) {
                 if (value === false) {
                     this.$validator.removeValidateRules('route.path');
                     this.$validator.removeValidateRules('route.name');
@@ -163,8 +185,8 @@
             this.getDict('resources_type').then(data => {
                 this.type_list = data;
             });
-            this.form = Object.assign( this.form, this.editData);
-            let route  = {
+            this.form = Object.assign(this.form, this.editData);
+            let route = {
                 name: '',
                 path: '',
                 component: '',
@@ -180,7 +202,7 @@
                 let temp = eval('(' + this.editData['route'] + ')');
                 route = Object.assign(route, temp);
             }
-            this.form['route'] = Object.assign({},route);
+            this.form['route'] = Object.assign({}, route);
         },
         methods: {
             //获取数据字典
@@ -198,9 +220,7 @@
             },
             //失去焦点的不显示图表
             iconBlur() {
-                setTimeout(() => {
-                    this.showIcons = false
-                }, 300)
+
             },
             //点击图标
             clickIcon(item) {
@@ -220,7 +240,7 @@
                 }
             },
             //过滤方法
-            filterNode(value,data){
+            filterNode(value, data) {
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
             },
@@ -244,33 +264,33 @@
             //确定改变父级菜单的id
             changePid() {
                 let node = this.$refs.tree.getCheckedNodes();
-                if(node!=null){//说明有选择
+                if (node != null) {//说明有选择
                     this.form['pid_text'] = node[0]['name'];
                     this.form['pid'] = node[0]['id'];
-                    this.form['level'] = node[0]['level']+1;
+                    this.form['level'] = node[0]['level'] + 1;
                     this.form['isn'] = node[0]['isn'];
-                }else{
+                } else {
                     this.form['pid_text'] = '';
-                    this.form['pid'] =0;
+                    this.form['pid'] = 0;
                 }
-                this.showPidDialog=false;
+                this.showPidDialog = false;
             },
             //改变菜单类型
-            changeType(){
-                if(this.form.type!=3){
+            changeType() {
+                if (this.form.type != 3) {
                     this.$validator.removeValidateRules('premissions');
                 }
             },
             //提交
             onSubmit() {
-                if(this.$validator.checkAll()){
-                    if( this.routeSwitch ){
+                if (this.$validator.checkAll()) {
+                    if (this.routeSwitch) {
                         this.form['route']['meta']['title'] = this.form['name'];
                         this.form['route']['meta']['icon'] = this.form['icon'];
                         this.form['route']['meta']['attr'] = this.form['attr'];
                     }
                     let editData = Object.assign({}, this.form);
-                    editData['route'] = this.routeSwitch?JSON.stringify(editData['route']):'';
+                    editData['route'] = this.routeSwitch ? JSON.stringify(editData['route']) : '';
                     editData['type'] = Number(editData['type']);
                     this.$http.post("user/resources/editResources", editData).then(res => {
                         if (res['data']['isSuccess']) {
@@ -308,7 +328,7 @@
         display: block;
     }
 
-    .el-alert{
+    .el-alert {
         padding: 0 16px;
     }
 
