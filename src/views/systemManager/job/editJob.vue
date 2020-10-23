@@ -2,13 +2,13 @@
     <div class="editJob">
         <el-form ref="form" label-width="6em">
             <el-form-item label="岗位名称" class="is-required">
-                <el-input v-model="form.name" v-validate
+                <el-input v-model="form.name" maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="name" validate-type="keyup"
                           validate-tips-required="请输入岗位名称"></el-input>
                 <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
             </el-form-item>
             <el-form-item label="岗位编码" class="is-required" >
-                <el-input v-model="form.code" v-validate
+                <el-input v-model="form.code" maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="code" validate-type="keyup"
                           validate-tips-required="请输入岗位编码"></el-input>
                 <el-alert v-if="errors.get('code')!=null" :title="errors.get('code')" type="error"/>
@@ -19,11 +19,11 @@
                     <el-radio :label="0">禁用</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="显示排序" class="wid50">
+            <el-form-item label="排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="描述">
-                <el-input type="textarea" v-model="form.description"></el-input>
+                <el-input type="textarea" maxlength="500" show-word-limit v-model="form.description"></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">

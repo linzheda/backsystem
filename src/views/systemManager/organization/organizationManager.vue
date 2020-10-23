@@ -31,7 +31,7 @@
                                 width="80"
                                 trigger="click">
                         <div class="columns-checkbox">
-                            <el-checkbox v-for="item of showColumns" :key="item.prop" v-model="item.isShow">
+                            <el-checkbox v-for="item of showColumns" @change="changeColumns" :key="item.prop" v-model="item.isShow">
                                 {{item.label}}
                             </el-checkbox>
                         </div>
@@ -151,6 +151,12 @@
                         this.appendData(item['children'], pid, result);
                     }
                 }
+            },
+            //表格重新布局
+            changeColumns() {
+                this.$nextTick(() => {
+                    this.$refs.treeTable.doLayout();
+                });
             },
             //点击编辑
             handleEdit(data) {

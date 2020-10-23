@@ -163,8 +163,8 @@
                 filter: {},//过滤条件
                 showSearch: true,//是否显示查询框
                 dataPage: {
-                    sizes: [100, 200, 300, 400],
-                    size: 100,
+                    sizes: [50,100, 200, 300, 400],
+                    size: 50,
                     current: 1,
                     total: 0,
                     records: []

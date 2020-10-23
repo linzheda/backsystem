@@ -124,8 +124,8 @@
                 showSearch: true,//是否显示搜索框
                 filter: {},//过滤参数
                 dataPage: {
-                    sizes: [100, 200, 300, 400],
-                    size: 100,
+                    sizes: [50,100, 200, 300, 400],
+                    size: 50,
                     current: 1,
                     total: 0,
                     records: []

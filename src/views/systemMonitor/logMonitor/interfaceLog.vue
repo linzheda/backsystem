@@ -155,8 +155,8 @@
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
                 dataPage: {
-                    sizes: [100, 200, 300, 400],
-                    size: 100,
+                    sizes: [50,100, 200, 300, 400],
+                    size: 50,
                     current: 1,
                     total: 0,
                     records: []

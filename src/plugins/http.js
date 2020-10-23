@@ -72,6 +72,9 @@ function transformRequest(data) {
     let str = [];
     for (let key in data) {
         let value=utils.isEmpty(data[key])?'':data[key];
+        if(typeof value=='string'){
+            value=value.trim();
+        }
         str.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
     }
     return str.join("&");

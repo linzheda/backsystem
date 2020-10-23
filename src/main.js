@@ -26,8 +26,7 @@ if (process.env.NODE_ENV != 'dev') {
     fundebugVue(fundebug, Vue);
 }*/
 
-let VueTouch = require('vue-touch');
-Vue.config.productionTip = process.env.NODE_ENV != 'dev' ? true : false;
+Vue.config.productionTip = process.env.NODE_ENV !== 'dev' ? true : false;
 //ui框架
 Vue.use(ElementUI);
 //动画样式
@@ -37,7 +36,7 @@ Vue.use(http);
 //工具类
 Vue.utils = utils;
 Vue.prototype.$utils = Vue.utils;
-
+//权限控制
 Vue.permissions = permissions;
 Vue.prototype.$permissions = Vue.permissions;
 //事件总线
@@ -49,8 +48,7 @@ Vue.use(has);
 Object.keys(filter).forEach(key => Vue.filter(key, filter[key]));
 //表单校验插件
 Vue.use(validate);
-//滑动事件
-Vue.use(VueTouch, {name: 'v-touch'});
+
 
 new Vue({
     router,

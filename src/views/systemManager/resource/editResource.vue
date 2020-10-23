@@ -34,25 +34,25 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="菜单名称" class="wid50 is-required">
-                <el-input v-model="form.name" v-validate
+                <el-input v-model="form.name" maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="name" validate-type="keyup"
-                          validate-tips-required="请输入字典名称"></el-input>
+                          validate-tips-required="请输入菜单名称"></el-input>
                 <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
             </el-form-item>
             <el-form-item label="权限标识" class="wid50 is-required" v-if="form.type==3">
-                <el-input v-model="form.premissions" v-validate
+                <el-input v-model="form.premissions" maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="premissions" validate-type="keyup"
-                          validate-tips-required="请输入字典名称"></el-input>
+                          validate-tips-required="请输入权限标识"></el-input>
                 <el-alert v-if="errors.get('premissions')!=null" :title="errors.get('premissions')" type="error"/>
             </el-form-item>
-            <el-form-item label="显示排序" class="wid50">
+            <el-form-item label="排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="描述">
-                <el-input type="textarea" v-model="form.description"></el-input>
+                <el-input type="textarea" maxlength="500" show-word-limit v-model="form.description"></el-input>
             </el-form-item>
             <el-form-item label="图标">
-                <el-input v-model="form.icon" @blur="iconBlur()" @focus="showIcons=true"></el-input>
+                <el-input v-model="form.icon" maxlength="50"  @blur="iconBlur()" @focus="showIcons=true"></el-input>
                 <div class="icon-div">
                     <el-tabs type="border-card" v-if="showIcons">
                         <el-tab-pane label="通用图标">

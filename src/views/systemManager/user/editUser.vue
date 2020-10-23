@@ -61,13 +61,16 @@
         <!--表单-->
         <el-form ref="form" label-width="6em">
             <el-form-item label="用户名" class="wid50 is-required">
-                <el-input v-model="form.name" v-validate
+                <el-input v-model="form.name" maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="name" validate-type="keyup"
                           validate-tips-required="请输入用户名"></el-input>
                 <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
             </el-form-item>
             <el-form-item label="登录账号" class="wid50 is-required">
-                <el-input v-model="form.loginname"></el-input>
+                <el-input v-model="form.loginname" maxlength="20" show-word-limit v-validate
+                          data-rules="required" validate-name="loginname" validate-type="keyup"
+                          validate-tips-required="请输入登录账号"></el-input>
+                <el-alert v-if="errors.get('loginname')!=null" :title="errors.get('loginname')" type="error"/>
             </el-form-item>
             <el-form-item label="状态" class="wid50 is-required">
                 <el-radio-group v-model="form.status">
@@ -76,7 +79,9 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="手机号" class="wid50">
-                <el-input v-model="form.tel"></el-input>
+                <el-input v-model="form.tel" v-validate
+                          data-rules="phone" validate-name="tel" validate-type="keyup"></el-input>
+                <el-alert v-if="errors.get('tel')!=null" :title="errors.get('tel')" type="error"/>
             </el-form-item>
             <el-form-item label="组织机构" class="wid50">
                 <el-input :disabled="true" @click.native="showOrgDialog=true" suffix-icon="el-icon-search"
@@ -103,7 +108,9 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="身份证" class="wid50">
-                <el-input v-model="form.idcard"></el-input>
+                <el-input v-model="form.idcard" v-validate
+                          data-rules="IDCard" validate-name="idcard" validate-type="keyup"></el-input>
+                <el-alert v-if="errors.get('idcard')!=null" :title="errors.get('idcard')" type="error"/>
             </el-form-item>
             <el-form-item label="性别" class="wid50">
                 <el-radio-group v-model="form.sex">
@@ -112,16 +119,18 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="地址" class="wid50">
-                <el-input v-model="form.address"></el-input>
+                <el-input maxlength="100" show-word-limit v-model="form.address"></el-input>
             </el-form-item>
             <el-form-item label="邮箱" class="wid50">
-                <el-input v-model="form.email"></el-input>
+                <el-input v-model="form.email" v-validate
+                          data-rules="email" validate-name="email" validate-type="keyup"></el-input>
+                <el-alert v-if="errors.get('email')!=null" :title="errors.get('email')" type="error"/>
             </el-form-item>
-            <el-form-item label="显示排序" class="wid50">
+            <el-form-item label="排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="备注">
-                <el-input type="textarea" v-model="form.remark"></el-input>
+                <el-input type="textarea" maxlength="500" show-word-limit v-model="form.remark"></el-input>
             </el-form-item>
 
         </el-form>
@@ -170,8 +179,8 @@
                 showJobDialog: false,//是否显示选择岗位的面板
                 filterText:'',//树形数据过滤关键字
                 dataPage: {
-                    sizes: [100, 200, 300, 400],
-                    size: 100,
+                    sizes: [50,100, 200, 300, 400],
+                    size: 50,
                     current: 1,
                     total: 0,
                     records: []

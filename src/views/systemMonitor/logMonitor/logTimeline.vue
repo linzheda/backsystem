@@ -14,9 +14,10 @@
             <el-timeline v-infinite-scroll="load" infinite-scroll-disabled="disabled">
                 <el-timeline-item v-for="(item,index) in timelineData " :key="index" :timestamp="item.createtime"
                                   placement="top">
-                    <el-card >
+                    <el-card>
                         <h4>{{item.module}}=>{{item.operdesc}}
-                            <el-tag :type="item.status===1?'success':'danger'" effect="dark" >{{item.status_text}}</el-tag>
+                            <el-tag :type="item.status===1?'success':'danger'" effect="dark">{{item.status_text}}
+                            </el-tag>
                         </h4>
                         <p v-if="type===1">
                             {{item.operatorid_text}}于{{item.createtime}}操作
@@ -63,6 +64,7 @@
 <script>
     import elDragDialog from '@/directives/el-drag-dialog';
     import LogDetail from "./logDetail";
+
     export default {
         name: "logTimeline",
         components: {LogDetail},
@@ -95,7 +97,7 @@
         },
         computed: {
             noMore() {
-                return this.dataPage.current === this.dataPage['pages'];
+                return this.dataPage.current === this.dataPage['pages'] || this.dataPage['pages'] === '0';
             },
             disabled() {
                 return this.loading || this.noMore
@@ -112,7 +114,7 @@
             if (this.$utils.isNotEmpty(this.paramData['client_id'])) {
                 this.type = 2;
             }
-            if (this.$utils.isNotEmpty(this.paramData['url'])){
+            if (this.$utils.isNotEmpty(this.paramData['url'])) {
                 this.type = 3;
             }
         },
@@ -131,7 +133,7 @@
                     param['userid'] = this.paramData['userid'];
                 } else if (this.type == 2) {
                     param['client_id'] = this.paramData['client_id'];
-                }else if (this.type==3){
+                } else if (this.type == 3) {
                     param['url'] = this.paramData['url'];
                 }
                 param = Object.assign(param, this.filter);
@@ -151,9 +153,9 @@
                 });
             },
             //点击查看详情
-            handleLogDetail(data){
-                this.editData=data;
-                this.showDetailDialog=true;
+            handleLogDetail(data) {
+                this.editData = data;
+                this.showDetailDialog = true;
             },
         }
     }
@@ -172,7 +174,8 @@
     .timeline-box {
         height: 500px;
         overflow-y: scroll;
-        .el-tag{
+
+        .el-tag {
             margin-left: 10px;
             padding: 0 2px;
             line-height: 16px;

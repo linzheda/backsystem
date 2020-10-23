@@ -28,26 +28,26 @@
                 <el-input :disabled="true" @click.native="showPidDialog=true" v-model="form.pid_text"
                           suffix-icon="el-icon-search"></el-input>
             </el-form-item>
-            <el-form-item label="字典名称" class="wid50 is-required">
-                <el-input v-model="form.name" v-validate
+            <el-form-item label="字典名称" class="is-required">
+                <el-input v-model="form.name"   maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="name" validate-type="keyup"
                           validate-tips-required="请输入字典名称"></el-input>
                 <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
             </el-form-item>
             <el-form-item label="字典键" class="is-required" >
-                <el-input v-model="form.dictkey" v-validate
+                <el-input v-model="form.dictkey" maxlength="20" show-word-limit v-validate
                           data-rules="required" validate-name="dictkey" validate-type="keyup"
                           validate-tips-required="请输入字典键"></el-input>
                 <el-alert v-if="errors.get('dictkey')!=null" :title="errors.get('dictkey')" type="error"/>
             </el-form-item>
             <el-form-item label="字典值">
-                <el-input v-model="form.value"></el-input>
+                <el-input v-model="form.value" maxlength="50" show-word-limit ></el-input>
             </el-form-item>
-            <el-form-item label="显示排序" class="wid50">
+            <el-form-item label="排序" class="wid50">
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="描述">
-                <el-input type="textarea" v-model="form.description"></el-input>
+                <el-input type="textarea" v-model="form.description" maxlength="500" show-word-limit ></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">

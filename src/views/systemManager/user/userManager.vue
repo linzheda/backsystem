@@ -217,8 +217,8 @@
                 showSearch: true,//是否显示搜索框
                 filter: {},//过滤参数
                 dataPage: {
-                    sizes: [100, 200, 300, 400],
-                    size: 100,
+                    sizes: [50,100, 200, 300, 400],
+                    size: 50,
                     current: 1,
                     total: 0,
                     records: []
@@ -226,15 +226,17 @@
                 showColumns: [
                     {label: '序号', prop: 'id', fixed: 'left', align: 'center', width: 80, isShow: true},
                     {label: '用户名', prop: 'name', fixed: 'left', align: 'center', width: 150, isShow: true},
-                    {label: '登录名', prop: 'loginname', width: 150, align: 'center', isShow: true},
-                    {label: '电话', prop: 'tel', width: 150, align: 'center', isShow: true},
+                    {label: '登录账号', prop: 'loginname', width: 150, align: 'center', isShow: true},
+                    {label: '手机号', prop: 'tel', width: 150, align: 'center', isShow: true},
                     {label: '状态', prop: 'status_text', width: 80, isScope: true, align: 'center', isShow: true},
-                    {label: '组织', prop: 'orgid_text', width: 180, align: 'center', isShow: true},
+                    {label: '组织机构', prop: 'orgid_text', width: 180, align: 'center', isShow: true},
                     {label: '岗位', prop: 'jobid_text', width: 100, align: 'center', isShow: false},
                     {label: '身份证', prop: 'idcard', width: 300, align: 'center', isShow: false},
                     {label: '性别', prop: 'sex_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
                     {label: '标签', prop: 'tag_text', isShow: true},
+                    {label: '排序', prop: 'seq', width: 80,align: 'center',  isShow: false},
+                    {label: '备注', prop: 'remark', width: 300,align: 'left',  isShow: false},
                     {label: '邮箱', prop: 'email', width: 300, align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板

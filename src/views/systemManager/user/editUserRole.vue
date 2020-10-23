@@ -13,7 +13,7 @@
                     v-model="rightTableData">
                 <template v-slot:leftCondition="{scope}">
                     <el-form-item label="名称">
-                        <el-input v-model="scope.keyWord" placeholder="请输入角色名称"></el-input>
+                        <el-input v-model="scope.name" placeholder="请输入角色名称"></el-input>
                     </el-form-item>
                     <el-form-item label="标签">
                         <el-select style="width: 100%"
