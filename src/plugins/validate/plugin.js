@@ -26,18 +26,23 @@ class validateUtil {
         Vue.directive('validate', {
             //指令第一次绑定到元素时调用
             bind: function (el, binding, vnode, oldnode) {
-                if(el.localName=='input'){
+                if (el.localName == 'input' || el.localName == 'textarea') {
                     pluginInstance.bindfunc(el, binding, vnode, oldnode);
-                }else{
-                    let input=el.getElementsByTagName('input');
-                    if(!input[0].getAttributeNames().includes('validate-type')){
-                        el.getAttributeNames().forEach(item=>{
-                            if(item.startsWith('validate-')||item==='data-rules'){
-                                input[0].setAttribute(item,el.getAttribute(item))
+                } else {
+                    let input = el.getElementsByTagName('input');
+                    if (input.length === 0) {
+                        input = el.getElementsByTagName('textarea');
+                    }
+                    if (input.length>0&&!input[0].getAttributeNames().includes('validate-type')) {
+                        el.getAttributeNames().forEach(item => {
+                            if (item.startsWith('validate-') || item === 'data-rules') {
+                                input[0].setAttribute(item, el.getAttribute(item))
                             }
                         })
                     }
-                    pluginInstance.bindfunc(input[0], binding, vnode, oldnode);
+                    if (input.length>0) {
+                        pluginInstance.bindfunc(input[0], binding, vnode, oldnode);
+                    }
                 }
             },
         })
@@ -50,25 +55,25 @@ class validateUtil {
     bindfunc(el, binding, vnode, oldnode) {
         let vm = vnode.context;
         let validate = this.createVM(vm);
-        this.addValidateRules(el, binding, vnode, oldnode,validate);
+        this.addValidateRules(el, binding, vnode, oldnode, validate);
         let vaType = el.getAttribute("validate-type");
         //v-validate:name.change='rules'
-        if (!vaType && binding.modifiers){
-            let types=Object.keys(binding.modifiers)
-            types&&types.length&&(vaType=types[0]);
+        if (!vaType && binding.modifiers) {
+            let types = Object.keys(binding.modifiers)
+            types && types.length && (vaType = types[0]);
         }
         switch (vaType) {
             case "change":
                 this.change(el, binding, vnode, oldnode, validate);
                 break;
             case "input":
-                this.oninput(el, binding, vnode, oldnode,validate);
+                this.oninput(el, binding, vnode, oldnode, validate);
                 break;
             case "keyup":
-                this.keyup(el, binding, vnode, oldnode,validate);
+                this.keyup(el, binding, vnode, oldnode, validate);
                 break;
             case "keydown":
-                this.keydown(el, binding, vnode, oldnode,validate);
+                this.keydown(el, binding, vnode, oldnode, validate);
                 break;
             default:
                 // this.change(el, binding, vnode, oldnode, validate);
@@ -77,27 +82,26 @@ class validateUtil {
     }
 
     //将验证规则放置 _validateRules
-    addValidateRules(el, binding, vnode, oldnode,validate) {
+    addValidateRules(el, binding, vnode, oldnode, validate) {
         let name = el.getAttribute("validate-name");
         let dataRules = el.getAttribute("data-rules");
         //v-validate:name='rules'
         if (!name && binding.arg) name = binding.arg;
         if (!dataRules && binding.value) dataRules = binding.value;
-        let rules, ruleName, ruleMap ={},msgMap={};
+        let rules, ruleName, ruleMap = {}, msgMap = {};
         if (isObject(dataRules)) {
             ruleMap = dataRules.rules;
-            msgMap= dataRules.msg
+            msgMap = dataRules.msg
         } else if (isString(dataRules)) {
             rules = dataRules.split(" ");
             for (let item of rules) {
-                if(!item) continue;
+                if (!item) continue;
                 let ruleArr = item.split("|");
                 let ruleParams = [];
                 for (let i = 0; i < ruleArr.length; i++) {
                     if (i === 0) {
                         ruleName = ruleArr[i];
-                    }
-                    else {
+                    } else {
                         try {
                             ruleParams.push(ruleArr[i] * 1);
                         } catch (e) {
@@ -105,15 +109,15 @@ class validateUtil {
                         }
                     }
                 }
-                ruleMap[ruleName]=ruleParams;
-                let itemtip=el.getAttribute(`validate-tips-${ruleName}`);
-                itemtip&&itemtip.length&&(msgMap[ruleName]=itemtip);
+                ruleMap[ruleName] = ruleParams;
+                let itemtip = el.getAttribute(`validate-tips-${ruleName}`);
+                itemtip && itemtip.length && (msgMap[ruleName] = itemtip);
             }
         }
         validate._validateRules[name] = ruleMap;
         validate._validateMsgs[name] = msgMap;
         //存储每个验证元素（貌似没啥用了）
-        validate._validatePositions[name]=el;
+        validate._validatePositions[name] = el;
     }
 
     change(el, binding, vnode, oldnode, validate) {
@@ -122,19 +126,19 @@ class validateUtil {
         })
     }
 
-    oninput(el, binding, vnode, oldnode,validate) {
+    oninput(el, binding, vnode, oldnode, validate) {
         el.addEventListener('input', () => {
             this.check(el, binding, validate);
         })
     }
 
-    keyup(el, binding, vnode, oldnode,validate) {
+    keyup(el, binding, vnode, oldnode, validate) {
         el.addEventListener('keyup', () => {
             this.check(el, binding, validate);
         })
     }
 
-    keydown(el, binding, vnode, oldnode,validate) {
+    keydown(el, binding, vnode, oldnode, validate) {
         el.addEventListener('keydown', () => {
             this.check(el, binding, validate);
         })
@@ -143,22 +147,24 @@ class validateUtil {
     check(el, binding, validate) {
         let name = el.getAttribute("validate-name");
         if (!name && binding.arg) name = binding.arg;
-        let rules = validate._validateRules[name],msgMap=validate._validateMsgs[name];
-        let checkobj={
-            name:name,
-            rules:rules,
-            msg:msgMap,
-            value:el.value,
-            el:el,
+        let rules = validate._validateRules[name], msgMap = validate._validateMsgs[name];
+        let checkobj = {
+            name: name,
+            rules: rules,
+            msg: msgMap,
+            value: el.value,
+            el: el,
         }
-        this.checkItem(checkobj,validate);
+        this.checkItem(checkobj, validate);
     }
-    checkItem(checkobj,validate){
-        let name=checkobj.name,rules=checkobj.rules,msgMap=checkobj.msg,value=checkobj.value,el=checkobj.el;
-        let ruleName, ruleParams,ruleResult = true;
-        !rules&&(rules=validate._validateRules[name]);
-        !msgMap&&(msgMap=validate._validateMsgs[name]);
-        !el&&(el=validate._validatePositions[name]);
+
+    checkItem(checkobj, validate) {
+        let name = checkobj.name, rules = checkobj.rules, msgMap = checkobj.msg, value = checkobj.value,
+            el = checkobj.el;
+        let ruleName, ruleParams, ruleResult = true;
+        !rules && (rules = validate._validateRules[name]);
+        !msgMap && (msgMap = validate._validateMsgs[name]);
+        !el && (el = validate._validatePositions[name]);
         for (let key of Object.keys(rules)) {
             ruleName = key;
             ruleParams = rules[key];
@@ -166,12 +172,12 @@ class validateUtil {
                 let _result = validator.methods[ruleName](value, el, ruleParams);
                 ruleResult = _result;
                 if (!_result) {
-                    let msg=validator.message[ruleName];
-                    if(msgMap&&msgMap[ruleName]){
-                        msg=msgMap[ruleName];
+                    let msg = validator.message[ruleName];
+                    if (msgMap && msgMap[ruleName]) {
+                        msg = msgMap[ruleName];
                     }
                     let errmsg = this.msgFormat(msg, ruleParams);
-                    validate.setErrors(name, errmsg,el);
+                    validate.setErrors(name, errmsg, el);
                     break;
                 }
             }
@@ -182,6 +188,7 @@ class validateUtil {
         }
         return ruleResult;
     }
+
     msgFormat(msg, param) {
         if (param !== undefined && param.constructor === Array) {
             param.forEach(function (value, index) {
@@ -204,44 +211,44 @@ class validateUtil {
     }
 
     //移除校验规则
-    removeValidateRules(name,validate){
-        for(let key of Object.keys(validate._validateRules)){
-           if(key==name){
-               delete validate._validateRules[key];
-               delete validate._validateMsgs[key];
-               delete validate._validatePositions[key];
-           }
+    removeValidateRules(name, validate) {
+        for (let key of Object.keys(validate._validateRules)) {
+            if (key == name) {
+                delete validate._validateRules[key];
+                delete validate._validateMsgs[key];
+                delete validate._validatePositions[key];
+            }
         }
     }
 
     //检查所有
-    checkAll(ckecklist,options,validate,autoTip=true){
-        let result=true;
-        if(!ckecklist||!ckecklist.length){
-            ckecklist=[];
-            for(let key of Object.keys(validate._validateRules)){
-                let checkItem={
-                    name:key,
-                    rules:validate._validateRules[key],
-                    msg:validate._validateMsgs[key],
-                    value:validate._validatePositions[key].value,
-                    el:validate._validatePositions[key],
+    checkAll(ckecklist, options, validate, autoTip = true) {
+        let result = true;
+        if (!ckecklist || !ckecklist.length) {
+            ckecklist = [];
+            for (let key of Object.keys(validate._validateRules)) {
+                let checkItem = {
+                    name: key,
+                    rules: validate._validateRules[key],
+                    msg: validate._validateMsgs[key],
+                    value: validate._validatePositions[key].value,
+                    el: validate._validatePositions[key],
                 };
                 ckecklist.push(checkItem);
             }
         }
-        if(ckecklist&&ckecklist.length){
-            for(let checkitem of ckecklist){
+        if (ckecklist && ckecklist.length) {
+            for (let checkitem of ckecklist) {
                 //是否仅验证加了 v-validate 的元素
-                if(options&&options.strict){
-                    if(!validate._validatePositions[checkitem.name])
+                if (options && options.strict) {
+                    if (!validate._validatePositions[checkitem.name])
                         continue;
                 }
-                let itemresult=this.checkItem(checkitem,validate);
-                result&&(result=itemresult);
+                let itemresult = this.checkItem(checkitem, validate);
+                result && (result = itemresult);
             }
         }
-        if(!result&&autoTip){
+        if (!result && autoTip) {
             Message({
                 message: validate.errors.errors[0]['msg'],
                 type: 'error',
@@ -252,21 +259,21 @@ class validateUtil {
     }
 
     //检查特定的选项
-    checkArr(checkArr,options,validate,autoTip=true){
-        let ckecklist=[];
-        for(let key of Object.keys(validate._validateRules)){
-            if(checkArr.includes(key)){
-                let checkItem={
-                    name:key,
-                    rules:validate._validateRules[key],
-                    msg:validate._validateMsgs[key],
-                    value:validate._validatePositions[key].value,
-                    el:validate._validatePositions[key],
+    checkArr(checkArr, options, validate, autoTip = true) {
+        let ckecklist = [];
+        for (let key of Object.keys(validate._validateRules)) {
+            if (checkArr.includes(key)) {
+                let checkItem = {
+                    name: key,
+                    rules: validate._validateRules[key],
+                    msg: validate._validateMsgs[key],
+                    value: validate._validatePositions[key].value,
+                    el: validate._validatePositions[key],
                 };
                 ckecklist.push(checkItem);
             }
         }
-        return this.checkAll(ckecklist,options,validate,autoTip);
+        return this.checkAll(ckecklist, options, validate, autoTip);
     }
 }
 
