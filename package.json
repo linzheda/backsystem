@@ -11,7 +11,7 @@
     "@tinymce/tinymce-vue": "^3.2.7",
     "amfe-flexible": "^2.2.1",
     "animate.css": "^3.7.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.4",
     "element-ui": "^2.15.0",
     "fundebug-javascript": "^2.4.0",
