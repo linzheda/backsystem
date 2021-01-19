@@ -1,6 +1,6 @@
 import utils from "@/utils/utils";
 class permissions {
-    static hasCnt(flag,meta){
+    static hasCnt(meta,flag='addchildren||edit||delete||log||detail||awardrole||awardresources||awarduser||loginout'){
         let result = 0;
         let arr;
         if(utils.isNotEmpty(meta['btnPermissions'])){

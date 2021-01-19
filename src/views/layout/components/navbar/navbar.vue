@@ -113,7 +113,7 @@
             //退出登录
             loginOut(){
                 this.$store.dispatch("loginOut",1).then(() => {
-                    location.reload();
+                    window.location.href = window.location.href.slice(0,window.location.href.indexOf('#')); // 必须刷新到锚点
                 });
             },
             //打开修改密码

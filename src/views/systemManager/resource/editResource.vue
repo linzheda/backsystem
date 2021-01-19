@@ -34,7 +34,7 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="菜单名称" class="wid50 is-required">
-                <el-input v-model="form.name" maxlength="20" show-word-limit v-validate
+                <el-input v-model="form.name" maxlength="20" @change="changeName" show-word-limit v-validate
                           data-rules="required" validate-name="name" validate-type="keyup"
                           validate-tips-required="请输入菜单名称"></el-input>
                 <el-alert v-if="errors.get('name')!=null" :title="errors.get('name')" type="error"/>
@@ -49,7 +49,7 @@
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="描述">
-                <el-input type="textarea" maxlength="500" show-word-limit v-model="form.description"></el-input>
+               <el-input type="textarea" :autosize="{ minRows: 2}"  maxlength="500" show-word-limit v-model="form.description"></el-input>
             </el-form-item>
             <el-form-item label="图标">
                 <el-input v-model="form.icon" maxlength="50"  @blur="iconBlur()" @focus="showIcons=true"></el-input>
@@ -90,32 +90,24 @@
                 </el-switch>
             </el-form-item>
             <div v-if="routeSwitch">
+                <el-form-item label="名称" class="wid50 is-required">
+                    <el-input v-model="form.route.name" @input="updatePath" v-validate
+                              data-rules="required" validate-name="route.name" validate-type="keyup"
+                              validate-tips-required="请输入名称"></el-input>
+                    <el-alert v-if="errors.get('route.name')!=null" :title="errors.get('route.name')" type="error"/>
+                </el-form-item>
                 <el-form-item label="路径" class="wid50 is-required">
                     <el-input v-model="form.route.path" v-validate
                               data-rules="required" validate-name="route.path" validate-type="keyup"
                               validate-tips-required="请输入路径"></el-input>
                     <el-alert v-if="errors.get('route.path')!=null" :title="errors.get('route.path')" type="error"/>
                 </el-form-item>
-                <el-form-item label="名称" class="wid50">
-                    <el-input v-model="form.route.name"></el-input>
-                </el-form-item>
-                <el-form-item label="组件" class="wid50 is-required">
-                    <el-input v-model="form.route.component" v-validate
-                              data-rules="required" validate-name="route.component" validate-type="keyup"
-                              validate-tips-required="请输入组件"></el-input>
-                    <el-alert v-if="errors.get('route.component')!=null" :title="errors.get('route.component')"
-                              type="error"/>
+                <el-form-item label="组件" class="wid50 ">
+                    <el-input v-model="form.route.component"></el-input>
                 </el-form-item>
                 <el-form-item label="重定位" class="wid50">
                     <el-input v-model="form.route.redirect"></el-input>
                 </el-form-item>
-                <el-form-item label="是否缓存" class="wid50">
-                    <el-radio-group v-model="form.route.meta.keepAlive">
-                        <el-radio :label="true">缓存</el-radio>
-                        <el-radio :label="false">不缓存</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-
             </div>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -280,6 +272,22 @@
                 if (this.form.type != 3) {
                     this.$validator.removeValidateRules('premissions');
                 }
+            },
+            //改变菜单
+            changeName(){
+                if (this.form.type == 3) {
+                   switch (this.form.name) {
+                       case '新增':this.form.premissions='add';break;
+                       case '新增子项':this.form.premissions='addchildren';break;
+                       case '编辑':this.form.premissions='edit';break;
+                       case '删除':this.form.premissions='delete';break;
+                       default:break;
+                   }
+                }
+            },
+            //修改路由名称 自动修改路由的path
+            updatePath(){
+                this.form.route['path'] = '/' + this.form.route['name'];
             },
             //提交
             onSubmit() {

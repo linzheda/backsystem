@@ -50,8 +50,8 @@ instance.interceptors.response.use(
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                store.dispatch('loginOut',0).then(() => {
-                    location.reload();// 为了重新实例化vue-router对象 避免bug
+                store.dispatch('loginOut', 0).then(() => {
+                    window.location.href = window.location.href.slice(0, window.location.href.indexOf('#')); // 必须刷新到锚点
                 });
             });
         } else {
@@ -71,9 +71,9 @@ instance.interceptors.response.use(
 function transformRequest(data) {
     let str = [];
     for (let key in data) {
-        let value=utils.isEmpty(data[key])?'':data[key];
-        if(typeof value=='string'){
-            value=value.trim();
+        let value = utils.isEmpty(data[key]) ? '' : data[key];
+        if (typeof value == 'string') {
+            value = value.trim();
         }
         str.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
     }
@@ -82,13 +82,13 @@ function transformRequest(data) {
 
 
 //获取所有配置的url
-let result={};
-for(let key in process.env){
-    if(key.endsWith('_URL')){
+let result = {};
+for (let key in process.env) {
+    if (key.endsWith('_URL')) {
         let newkey = key.replace("VUE_APP_", '').replace("_URL", '');
         newkey = newkey.toLocaleLowerCase();
         result[newkey] = process.env[key];
-        if(newkey==='base'&&process.env.NODE_ENV==='dev'){
+        if (newkey === 'base' && process.env.NODE_ENV === 'dev') {
             result[newkey] = '/api/';
         }
     }
@@ -96,39 +96,27 @@ for(let key in process.env){
 const urlApi = result;
 
 
-const get = (url, params = {}, isCheck = true, baseUrl = urlApi['base'],isTransform=true) => {
-    url = baseUrl + url;
-    //转换为键值对的形式
-    if(isTransform){
-        params=transformRequest(params)
-    }
-    //检查约定的状态码
-    if (isCheck) {
-        return instance.get(url, params).then(res => {
-            if (res.code != 200) {
-                Message({
-                    message: res.msg,
-                    type: 'error',
-                    duration: 3 * 1000
-                });
-            } else {
-                return res;
-            }
-        });
-    } else {
-        return instance.get(url, params);
-    }
+const get = (url, params = {}, isCheck = true, baseUrl = urlApi['base'], isTransform = true) => {
+    return doRequest('get', url, params, isCheck, baseUrl, isTransform)
 };
 
-const post = (url, params = {}, isCheck = true, baseUrl = urlApi['base'] ,isTransform=true) => {
+const post = (url, params = {}, isCheck = true, baseUrl = urlApi['base'], isTransform = true) => {
+    return doRequest('post', url, params, isCheck, baseUrl, isTransform)
+};
+
+const postFile = (url, params = {}, isCheck = true, baseUrl = urlApi['base'], isTransform = true) => {
+    return doRequest('file', url, params, isCheck, baseUrl, isTransform);
+}
+
+function doRequest(way = 'post', url, params = {}, isCheck = true, baseUrl = urlApi['base'], isTransform = true) {
     url = baseUrl + url;
     //转换为键值对的形式
-    if(isTransform){
-        params=transformRequest(params)
+    if (isTransform) {
+        params = transformRequest(params)
     }
     //检查约定的状态码
     if (isCheck) {
-        return instance.post(url, params).then(res => {
+        return request(way, url, params).then(res => {
             if (res.code != 200) {
                 Message({
                     message: res.msg,
@@ -140,19 +128,37 @@ const post = (url, params = {}, isCheck = true, baseUrl = urlApi['base'] ,isTran
             }
         });
     } else {
-        return instance.post(url, params);
+        return request(way, url, params);
     }
-};
+}
+
+async function request(way, url, params) {
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+    };
+    switch (way) {
+        case 'post':
+            return instance.post(url, params);
+        case 'get':
+            return instance.get(url, params);
+        case 'file':
+            return instance.post(url, params, config);
+    }
+}
+
 
 export {
     get,
     post,
+    postFile,
     urlApi
 }
 
 export default {
     install(Vue) {
-        Vue.http = {get, post, urlApi};
+        Vue.http = {get, post, postFile, urlApi};
         Vue.prototype.$http = Vue.http;
     }
 };

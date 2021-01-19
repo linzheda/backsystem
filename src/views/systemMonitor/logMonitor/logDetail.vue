@@ -29,13 +29,13 @@
                 <el-tag :type="form.status===1?'success':'danger'"  >{{form.status_text}}</el-tag>
             </el-form-item>
             <el-form-item label="请求参数">
-                <el-input type="textarea" v-model="form.reqparam" disabled></el-input>
+               <el-input type="textarea" :autosize="{ minRows: 2}"  v-model="form.reqparam" disabled></el-input>
             </el-form-item>
             <el-form-item label="返回参数">
-                <el-input type="textarea" v-model="form.outresult" disabled></el-input>
+               <el-input type="textarea" :autosize="{ minRows: 2}"  v-model="form.outresult" disabled></el-input>
             </el-form-item>
             <el-form-item label="错误信息" v-if="form.errormsg!=null">
-                <el-input type="textarea" v-model="form.errormsg" disabled></el-input>
+               <el-input type="textarea" :autosize="{ minRows: 2}"  v-model="form.errormsg" disabled></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">

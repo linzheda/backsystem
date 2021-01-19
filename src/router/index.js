@@ -7,7 +7,6 @@ NProgress.configure({showSpinner: false}) // NProgress Configuration
 Vue.use(Router);
 
 let routes = [
-
     {
         path: '/',
         name: '/',
@@ -16,12 +15,10 @@ let routes = [
         meta: {keepAlive: false, requireLogin: false}
     },
 ];
-const routerContext = require.context('./', true, /\.js$/);
+
+//处理静态路由自动加载
+const routerContext = require.context('./static', true, /\.js$/);
 routerContext.keys().forEach(route => {
-    // 如果是根目录的 index.js 、不处理
-    if (route.startsWith('./index')) {
-        return
-    }
     const routerModule = routerContext(route);
     /**
      * 兼容 import export 和 require module.export 两种规范
@@ -72,13 +69,10 @@ history.clear();
 
 myRouter.beforeEach((to, from, next) => {
     NProgress.start();//页面加载进度条
-    let isNeedLogin = true;
-    if (to.meta.requireLogin != null && to.meta.requireLogin === false) {
-        isNeedLogin = false;
-    }
+    let isNeedLogin = !!(to.meta['require'] && to.meta['require'].includes('login'));
     if (isNeedLogin) {//需要拦截
         if (store.getters.token != null && store.getters.id != null) {
-            if (store.getters.menus == null || store.getters.menus.length == 0) {
+            if (store.getters.menus == null || store.getters.menus.length === 0) {
                 store.dispatch('getMenu').then(() => {
                     let name = to.path.substring(to.path.lastIndexOf('/') + 1);
                     if(name==='index'){

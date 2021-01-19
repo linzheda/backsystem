@@ -39,7 +39,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="描述">
-                <el-input type="textarea" maxlength="500" show-word-limit v-model="form.description"></el-input>
+               <el-input type="textarea" :autosize="{ minRows: 2}"  maxlength="500" show-word-limit v-model="form.description"></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">

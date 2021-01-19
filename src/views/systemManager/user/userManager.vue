@@ -217,7 +217,7 @@
                 showSearch: true,//是否显示搜索框
                 filter: {},//过滤参数
                 dataPage: {
-                    sizes: [50,100, 200, 300, 400],
+                    sizes: [50, 100, 200, 300, 400],
                     size: 50,
                     current: 1,
                     total: 0,
@@ -235,8 +235,8 @@
                     {label: '性别', prop: 'sex_text', width: 80, isScope: true, align: 'center', isShow: true},
                     {label: '地址', prop: 'address', isShow: true},
                     {label: '标签', prop: 'tag_text', isShow: true},
-                    {label: '排序', prop: 'seq', width: 80,align: 'center',  isShow: false},
-                    {label: '备注', prop: 'remark', width: 300,align: 'left',  isShow: false},
+                    {label: '排序', prop: 'seq', width: 80, align: 'center', isShow: false},
+                    {label: '备注', prop: 'remark', width: 300, align: 'left', isShow: false},
                     {label: '邮箱', prop: 'email', width: 300, align: 'center', isShow: false},
                 ],//显示的列
                 showEditDialog: false,//是否显示编辑面板
@@ -254,7 +254,7 @@
             }
         },
         created() {
-            this.btnCnt = this.$permissions.hasCnt('edit||delete||awardrole||log', this.$route.meta);
+            this.btnCnt = this.$permissions.hasCnt(this.$route.meta);
         },
         mounted() {
             this.getData();

@@ -5,7 +5,6 @@
 </template>
 
 <script>
-    import $ from 'jquery';
     import PageIframe from "../../components/pageIframe/pageIframe";
 
     export default {
@@ -26,12 +25,7 @@
         methods:{
             init(){
                 let turine='http://localhost:8090/actuator/hystrix.stream';
-                this.$nextTick().then(() => {
-                    setTimeout(()=>{
-                        $("#hystrixdashboard-iframe").contents().find("#strem").val(turine);
-                    },500);
-
-                });
+                console.log(turine);
             }
         }
     }

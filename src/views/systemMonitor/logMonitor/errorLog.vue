@@ -180,7 +180,7 @@
         created() {
             this.getOperType();
             this.getData();
-            this.btnCnt = this.$permissions.hasCnt('detail||delete', this.$route.meta);
+            this.btnCnt = this.$permissions.hasCnt(this.$route.meta);
         },
         mounted() {
         },

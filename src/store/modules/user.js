@@ -109,6 +109,7 @@ const user = {
         }
     }
 };
+const routerContext =require.context('@/views', true, /\.vue$/,'lazy').keys();
 // 遍历后台传来的路由字符串，转换为组件对象
 // eslint-disable-next-line no-unused-vars
 function filterAsyncRouter(asyncRouterMap) { //遍历后台传来的路由字符串，转换为组件对象
@@ -119,6 +120,12 @@ function filterAsyncRouter(asyncRouterMap) { //遍历后台传来的路由字符
             } else {
                 route.component = loadView(route.component)
             }
+        }else{//没有组件 自动装配
+            route.component =autoView(route.name);
+        }
+        //如果没有path
+        if(!route.path){
+            route['path']='/'+route.name;
         }
         if (route.children && route.children.length) {
             route.children = filterAsyncRouter(route.children)
@@ -127,9 +134,20 @@ function filterAsyncRouter(asyncRouterMap) { //遍历后台传来的路由字符
     });
     return accessedRouters
 }
+//自动装配路由
+function autoView(name) {
+    let result = null;
+    routerContext.forEach(key=>{
+        let target = '';
+        target = key.substring(key.lastIndexOf('/') + 1,key.lastIndexOf('.vue'));
+        if(target === name){
+            result = key.substring(1, key.length - 4);
+        }
+    });
+    return result?()=>import('@/views' + result ):false;
+}
+// 路由懒加载
 function loadView(view) {
-    // 路由懒加载
     return () => import('@/views/' + view );
 }
-
 export default user

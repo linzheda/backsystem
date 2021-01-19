@@ -26,7 +26,7 @@ if (process.env.NODE_ENV != 'dev') {
     fundebugVue(fundebug, Vue);
 }*/
 
-Vue.config.productionTip = process.env.NODE_ENV !== 'dev' ? true : false;
+Vue.config.productionTip = process.env.NODE_ENV !== 'dev';
 //ui框架
 Vue.use(ElementUI);
 //动画样式

@@ -43,6 +43,7 @@
                 <el-table :data="data" row-key="id" lazy :load="load"
                           highlight-current-row ref="treeTable"
                           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+                          @row-contextmenu="rightClickTable"
                           style="width: 100%" border height="100%">
                     <template v-for="item of showColumns">
                         <el-table-column :key="item.prop" v-if="item.isShow&&item.isScope!=true"
@@ -52,6 +53,11 @@
                     </template>
                     <el-table-column label="操作" :width="btnCnt*60" align="center" fixed="right" v-if="btnCnt>0">
                         <template slot-scope="scope">
+                            <el-tooltip  content="新增子项" placement="top">
+                                <el-button class="el-icon-plus" circle type="primary" size="mini"
+                                           @click="handleAdd(scope.row)"  v-has="'addchildren'">
+                                </el-button>
+                            </el-tooltip>
                             <el-tooltip  content="编辑" placement="top">
                                 <el-button class="el-icon-edit" circle type="primary" size="mini"
                                         @click="handleEdit(scope.row)"  v-has="'edit'">
@@ -66,7 +72,16 @@
                     </el-table-column>
                 </el-table>
             </div>
+            <!--右键菜单-->
+            <ul v-show="showRightMenu" :style="{left:rightMenuLeft+'px',top:rightMenuTop+'px'}" class="rightMenu">
+                <li  v-has="'addchildren'" @click="handleAdd(rightMenuRow)"><i class="el-icon-plus">新增子项</i></li>
+                <li  v-has="'edit'" @click="handleEdit(rightMenuRow)"><i class="el-icon-edit">编辑</i></li>
+                <li  v-has="'delete'" @click="handleDelete(rightMenuRow)" ><i class="el-icon-delete">删除</i></li>
+            </ul>
         </div>
+
+
+
         <!--弹窗-->
         <el-dialog v-el-drag-dialog
                    v-if="showEditDialog"
@@ -103,10 +118,23 @@
                 ],//显示的列
                 showSearch: true,//是否显示查询栏
                 btnCnt: 0,//拥有的操作个数
+                showRightMenu:false,//是否显示右键菜单
+                rightMenuLeft:0,//右键菜单居左位置
+                rightMenuTop:0,//右键菜单居左位置
+                rightMenuRow:null,//右键菜单选中的数据
+            }
+        },
+        watch: {
+            showRightMenu(value) {//是否显示右键菜单
+                if (value) {
+                    document.body.addEventListener('click', this.closeRightMenu)
+                } else {
+                    document.body.removeEventListener('click', this.closeRightMenu)
+                }
             }
         },
         created() {
-            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
+            this.btnCnt = this.$permissions.hasCnt(this.$route.meta);
             this.getTeeDataByPid(0).then(data => {
                 this.$nextTick(() => {
                     this.data = data;
@@ -158,6 +186,19 @@
                     this.$refs.treeTable.doLayout();
                 });
             },
+            //右键点击表格
+            rightClickTable(row, column, event){
+                event.preventDefault() //关闭浏览器右键默认事件
+                // 根据事件对象中鼠标点击的位置，进行定位
+                this.rightMenuLeft = event.clientX;
+                this.rightMenuTop = event.clientY;
+                this.rightMenuRow = row;
+                this.showRightMenu=this.btnCnt > 0;
+            },
+            //关闭右键菜单
+            closeRightMenu(){
+                this.showRightMenu=false;
+            },
             //点击编辑
             handleEdit(data) {
                 if (this.$utils.isEmpty(data)) {//说明是点击表格上方的编辑
@@ -195,9 +236,9 @@
 
             },
             //点击新增
-            handleAdd() {
-                this.editData = {};
-                this.showEditDialog = true;
+            handleAdd(item=null) {
+                this.editData =item?{pid:item['id'],pid_text:item['name']}:{};
+                    this.showEditDialog = true;
             },
             //重新加载数据
             loadData(pid = 0, isReset = false) {
@@ -272,6 +313,28 @@
         .table {
             table thead .el-table tr {
                 background-color: #EFF3F8;
+            }
+        }
+        .rightMenu{
+            position: fixed;
+            margin: 0;
+            padding:0;
+            text-align: left;
+            z-index: 3000;
+            background: #fff;
+            list-style-type: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #333;
+            box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+            li {
+                margin: 0;
+                padding: 15px 20px;
+                cursor: pointer;
+                &:hover {
+                    background: #eee;
+                }
             }
         }
 

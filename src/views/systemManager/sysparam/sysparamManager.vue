@@ -130,7 +130,7 @@
             }
         },
         created() {
-            this.btnCnt = this.$permissions.hasCnt('edit||delete', this.$route.meta);
+            this.btnCnt = this.$permissions.hasCnt(this.$route.meta);
             this.getData();
         },
         mounted() {

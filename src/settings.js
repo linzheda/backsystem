@@ -1,5 +1,5 @@
 module.exports = {
-    title: '林哲达后台管理系统',
+    title: '后台管理系统',
 
     /**是否显示设置
      * @type {boolean} true | false

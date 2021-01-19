@@ -47,7 +47,7 @@
                 <el-input type="number" v-model="form.seq"></el-input>
             </el-form-item>
             <el-form-item label="描述">
-                <el-input type="textarea" v-model="form.description" maxlength="500" show-word-limit ></el-input>
+               <el-input type="textarea" :autosize="{ minRows: 2}"  v-model="form.description" maxlength="500" show-word-limit ></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
