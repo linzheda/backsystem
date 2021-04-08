@@ -21,7 +21,6 @@
             this.getSystem();
         },
         mounted() {
-
         },
         methods: {
             //获取参数

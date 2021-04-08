@@ -1,20 +1,18 @@
 <template>
     <div class="editRoleResources">
         <el-input prefix-icon="el-icon-search"
-                placeholder="输入关键字进行过滤"
-                v-model="filterText">
+                  placeholder="输入关键字进行过滤"
+                  v-model="filterText">
         </el-input>
         <el-tree
                 :props="{children: 'children',label: 'name',isLeaf: 'leaf'}"
                 ref="tree"
+                :data="treeData"
                 show-checkbox
-                check-strictly
-                :default-checked-keys="defaultCheckedArr"
+                :default-checked-keys="showCheckedArr"
                 node-key="id"
-                @check-change="changeChecked"
-                :load="loadNode"
-                :filter-node-method="filterNode"
-                lazy>
+                @check="changeChecked"
+                :filter-node-method="filterNode">
         </el-tree>
         <span slot="footer" class="dialog-footer">
                 <el-button @click="showCurrentDialog = false">取 消</el-button>
@@ -36,10 +34,11 @@
         data() {
             return {
                 defaultCheckedArr: [],//被选中的数组
+                showCheckedArr: [],//展示被选中的数组(只要叶子节点)
                 addCheckedArr: [],//新增的资源数据
                 delCheckedArr: [],//删除的资源数据
-                treeData:[],//树形数据
-                filterText:'',//树形数据过滤关键字
+                treeData: [],//树形数据
+                filterText: '',//树形数据过滤关键字
                 showCurrentDialog: this.showDialog,//是否显示选择当前的dialog
             }
         },
@@ -54,6 +53,9 @@
             }
         },
         created() {
+            this.getTreeByPid(null).then(res => {
+                this.treeData = res;
+            });
         },
         mounted() {
         },
@@ -67,57 +69,46 @@
                 return new Promise(resolve => {
                     this.$http.post('user/roleResources/getResourcesListByRoleId', param).then(res => {
                         let data = res['data'];
-                        data.forEach(item => {
-                            item['leaf'] = item['children_cnt'] > 0 ? false : true;
-                            item['label'] = item['name'];
-                            if (item['ischecked'] == 1) {//说明是被选中的节点
-                                this.defaultCheckedArr.push(item['id']);
-                            }
-                        });
+                        let forTree = (arr) => {
+                            arr.forEach(item => {
+                                if(item['ischecked']==1){
+                                    this.defaultCheckedArr.push(item['id']);
+                                    if(item['children_cnt']<=0){
+                                        this.showCheckedArr.push(item['id']);
+                                    }
+                                }
+                                if(item['children_cnt']>0){
+                                    forTree(item['children']);
+                                }
+                            });
+                        };
+                        forTree(data);
                         resolve(data);
                     });
                 });
             },
-            //菜单树加载
-            loadNode(node, resolve) {
-                let pid = this.$utils.isNotEmpty(node['data']) ? node['data']['id'] : 0;
-                this.getTreeByPid(pid).then(res => {
-                    resolve(res);
-                });
-            },
             //过滤方法
-            filterNode(value,data){
+            filterNode(value, data) {
                 if (!value) return true;
                 return data.label.indexOf(value) !== -1;
             },
             //改变选择框时 判断是否在默认数组里
-            changeChecked(data, checked) {
-                let index = this.defaultCheckedArr.findIndex(item => {return item == data['id']});
-                if (checked) {//说明是选中
-                    if(index==-1){//说明默认不存在
-                        this.addCheckedArr.push(data['id']);
-                    }else{
-                        let temp = this.delCheckedArr.findIndex(item => {return item == data['id']});
-                        this.delCheckedArr.splice(temp, 1);
-                    }
-                }else{//说明是取消
-                    if(index==-1){
-                        let temp = this.addCheckedArr.findIndex(item => {return item == data['id']});
-                        this.addCheckedArr.splice(temp, 1);
-                    }else{
-                        this.delCheckedArr.push(data['id']);
-                    }
-                }
+            changeChecked() {
+                let checkedArr = this.$refs.tree.getCheckedNodes(false, true);
+                let delCheckedArr = this.defaultCheckedArr.filter(item => !checkedArr.some(item2 => item === item2['id']));
+                let addCheckedArr = checkedArr.filter(item => !this.defaultCheckedArr.some(item2 => item['id'] === item2));
+                this.addCheckedArr = addCheckedArr.map(i => i['id']);
+                this.delCheckedArr = delCheckedArr;
             },
             //提交
             onSubmit() {
-                if(this.addCheckedArr.length>0||this.delCheckedArr.length>0){
-                    let param={
+                if (this.addCheckedArr.length > 0 || this.delCheckedArr.length > 0) {
+                    let param = {
                         roleid: this.editData['id'],
-                        addArr:this.addCheckedArr,
-                        delArr:this.delCheckedArr,
+                        addArr: this.addCheckedArr,
+                        delArr: this.delCheckedArr,
                     };
-                    this.$http.post('user/roleResources/updateRoleResourcesByRoleId',param).then(res => {
+                    this.$http.post('user/roleResources/updateRoleResourcesByRoleId', param).then(res => {
                         if (res['data']['isSuccess']) {
                             this.showCurrentDialog = false;
                             this.$message({
@@ -128,7 +119,7 @@
                             this.$message.error(res['msg']);
                         }
                     });
-                }else{
+                } else {
                     this.showCurrentDialog = false;
                     this.$message.warning("资源菜单未更改");
                 }

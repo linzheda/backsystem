@@ -58,7 +58,7 @@ const scrollBehavior = function (to, from, savedPosition) {
     }
 };
 const createRouter = () => new Router({
-    // mode: 'history', // require service support
+    mode: 'history', // require service support
     scrollBehavior: scrollBehavior,
     routes
 });
@@ -69,39 +69,36 @@ history.clear();
 
 myRouter.beforeEach((to, from, next) => {
     NProgress.start();//页面加载进度条
-    let isNeedLogin = !!(to.meta['require'] && to.meta['require'].includes('login'));
-    if (isNeedLogin) {//需要拦截
-        if (store.getters.token != null && store.getters.id != null) {
-            if (store.getters.menus == null || store.getters.menus.length === 0) {
+    if (to.matched && to.matched.length > 0) {//说明不是刷新
+        let isNeedLogin = !!(to.meta['require'] && to.meta['require'].includes('login'));
+        if (isNeedLogin && (!store.getters.token || !store.getters.id)) {//需要拦截
+            next(`/login?redirect=${to.path}`)
+        } else {
+            next();
+        }
+    } else {//说明是刷新
+        if (store.getters.token && store.getters.id) {
+            if (!store.getters.menus || store.getters.menus.length === 0) {
                 store.dispatch('getMenu').then(() => {
-                    let name = to.path.substring(to.path.lastIndexOf('/') + 1);
-                    if(name==='index'){
-                        next({path: to.path});
-                    }else {
-                        let view = {
-                            path: "/dashboard",
-                            name: "dashboard",
-                            meta: {
-                                affix: true,
-                                icon: "home",
-                                keepAlive: true,
-                                title: "首页",
-                            }
-                        };
-                        store.dispatch('addTagsView', view);
-                        next({name: name});
-                    }
+                    let view = {
+                        path: "/dashboard",
+                        name: "dashboard",
+                        meta: {
+                            affix: true,
+                            icon: "home",
+                            keepAlive: true,
+                            title: "首页",
+                        }
+                    };
+                    store.dispatch('addTagsView', view);
+                    next({...to, replace: true});
                 });
             } else {
-                next();
+                next({path: '/'});
             }
         } else {
-            next({
-                name: '/'
-            });
+            next({path: '/'});
         }
-    } else {
-        next();
     }
 });
 

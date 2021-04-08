@@ -70,6 +70,9 @@
                         <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索
                         </el-button>
                     </el-form-item>
+                    <el-form-item label-width="10px" v-has="'expExecel'">
+                        <export-excel round file-name="用户数据" :header="excelHeader" :data="excelData"/>
+                    </el-form-item>
                 </el-form>
             </div>
             <!--表格-->
@@ -79,6 +82,7 @@
                         <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
                         <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改
                         </el-button>
+
                     </div>
                     <div class="tui-right">
                         <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -204,13 +208,61 @@
     import elDragDialog from '@/directives/el-drag-dialog';
     import EditUserRole from "./editUserRole";
     import LogTimeline from "../../systemMonitor/logMonitor/logTimeline";
+    import ExportExcel from "../../../components/exportExcel/exportExcel";
 
     export default {
         name: "userManager",
         directives: {elDragDialog},
-        components: {LogTimeline, EditUserRole, EditUser},
+        components: {ExportExcel, LogTimeline, EditUserRole, EditUser},
         data() {
             return {
+                excelHeader: [
+                    {
+                        text: '序号',
+                        value: 'id'
+                    },
+                    {
+                        text: '用户名',
+                        value: 'name'
+                    },
+                    {
+                        text: '登录账号',
+                        value: 'loginname'
+                    },
+                    {
+                        text: '手机号',
+                        value: 'tel'
+                    },
+                    {
+                        text: '组织机构',
+                        value: 'orgid_text'
+                    },
+                    {
+                        text: '岗位',
+                        value: 'jobid_text'
+                    },
+                    {
+                        text: '身份证',
+                        value: 'idcard'
+                    },
+                    {
+                        text: '性别',
+                        value: 'sex_text'
+                    },
+                    {
+                        text: '地址',
+                        value: 'address'
+                    },
+                    {
+                        text: '备注',
+                        value: 'remark'
+                    },
+                    {
+                        text: '邮箱',
+                        value: 'email'
+                    }
+                ],//excel 表头
+                excelData: [],
                 isOpenOrgTree: true,//是否展开组织机构树形菜单
                 isOpenOrgDiv: true,//展开收起组织机构的面板
                 orgTreeData: [],//组织机构的树形菜单
@@ -327,6 +379,7 @@
                 param = Object.assign(param, this.filter);
                 this.$http.post("user/user/getUserList", param).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
+                    this.excelData = this.dataPage.records;
                 });
             },
             //表格重新布局
