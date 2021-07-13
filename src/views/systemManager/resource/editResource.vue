@@ -281,7 +281,8 @@
                        case '新增子项':this.form.premissions='addchildren';break;
                        case '编辑':this.form.premissions='edit';break;
                        case '删除':this.form.premissions='delete';break;
-                       case '导出Excel':this.form.premissions='expExecel';break;
+                       case '导出Excel':this.form.premissions='expExcel';break;
+                       case '导入Excel':this.form.premissions='impExcel';break;
                        default:break;
                    }
                 }

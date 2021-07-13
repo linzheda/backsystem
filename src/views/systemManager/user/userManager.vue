@@ -70,7 +70,7 @@
                         <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索
                         </el-button>
                     </el-form-item>
-                    <el-form-item label-width="10px" v-has="'expExecel'">
+                    <el-form-item label-width="10px" v-has="'expExcel'">
                         <export-excel round file-name="用户数据" :header="excelHeader" :data="excelData"/>
                     </el-form-item>
                 </el-form>

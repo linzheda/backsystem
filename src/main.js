@@ -14,7 +14,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import animated from 'animate.css';
 import validate from './plugins/validate/plugin';
 import '@/styles/index.scss';
-import '@/styles/rem.js';
+// import '@/styles/rem.js';
 import '@/icons'; // icon
 //findebug
 /*import * as fundebug from "fundebug-javascript";
