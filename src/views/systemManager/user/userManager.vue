@@ -67,11 +67,13 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label-width="10px">
-                        <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索
-                        </el-button>
+                        <el-button type="primary" icon="el-icon-search" round @click="getData('current',1)">搜索</el-button>
                     </el-form-item>
                     <el-form-item label-width="10px" v-has="'expExcel'">
                         <export-excel round file-name="用户数据" :header="excelHeader" :data="excelData"/>
+                    </el-form-item>
+                    <el-form-item label-width="10px" v-has="'impExcel'">
+                        <import-excel-for-user />
                     </el-form-item>
                 </el-form>
             </div>
@@ -80,9 +82,7 @@
                 <div class="do-box">
                     <div class="tui-left">
                         <el-button type="primary" icon="el-icon-plus" @click="handleAdd()" v-has="'add'">新增</el-button>
-                        <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改
-                        </el-button>
-
+                        <el-button type="primary" icon="el-icon-edit" @click="handleEdit()" v-has="'edit'">修改</el-button>
                     </div>
                     <div class="tui-right">
                         <el-button icon="el-icon-search" @click="showSearch=!showSearch"></el-button>
@@ -209,11 +209,12 @@
     import EditUserRole from "./editUserRole";
     import LogTimeline from "../../systemMonitor/logMonitor/logTimeline";
     import ExportExcel from "../../../components/exportExcel/exportExcel";
+    import ImportExcelForUser from "./importExcelForUser";
 
     export default {
         name: "userManager",
         directives: {elDragDialog},
-        components: {ExportExcel, LogTimeline, EditUserRole, EditUser},
+        components: {ImportExcelForUser, ExportExcel, LogTimeline, EditUserRole, EditUser},
         data() {
             return {
                 excelHeader: [
@@ -325,7 +326,7 @@
                     pid: pid,
                 };
                 return new Promise(resolve => {
-                    this.$http.post('user/organization/getOrganizationByPid', param).then(res => {
+                    this.$http.post('user/organization/getOrganizationByPid', param,{showLoading:true}).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['leaf'] = item['children_cnt'] > 0 ? false : true;
@@ -377,7 +378,7 @@
                     size: this.dataPage.size,
                 };
                 param = Object.assign(param, this.filter);
-                this.$http.post("user/user/getUserList", param).then(res => {
+                this.$http.post("user/user/getUserList", param,{showLoading:true}).then(res => {
                     this.dataPage = Object.assign(this.dataPage, res.data);
                     this.excelData = this.dataPage.records;
                 });

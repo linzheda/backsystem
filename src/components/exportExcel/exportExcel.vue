@@ -5,7 +5,7 @@
 <template>
     <div class="exportExcel" @click="clickExport">
         <slot>
-            <el-button type="primary" v-bind="$attrs" icon="el-icon-upload">导出</el-button>
+            <el-button type="primary" v-bind="$attrs" icon="el-icon-upload2">导出</el-button>
         </slot>
         <!--dialog 显示导出的文件类型 文件名称 -->
         <el-dialog v-el-drag-dialog
