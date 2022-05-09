@@ -19,7 +19,7 @@
     "fundebug-revideo": "^0.6.2",
     "fundebug-vue": "0.0.1",
     "js-md5": "^0.7.3",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^6.1.0",
     "qiankun": "^2.4.0",
