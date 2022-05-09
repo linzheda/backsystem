@@ -326,7 +326,7 @@
                     pid: pid,
                 };
                 return new Promise(resolve => {
-                    this.$http.post('user/organization/getOrganizationByPid', param,{showLoading:true}).then(res => {
+                    this.$http.post('user/organization/getOrganizationByPid', param).then(res => {
                         let data = res['data'];
                         data.forEach(item => {
                             item['leaf'] = item['children_cnt'] > 0 ? false : true;
